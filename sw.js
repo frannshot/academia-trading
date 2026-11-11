@@ -1,4 +1,4 @@
-const VERSION="2026.11.11-2";
+const VERSION="2026.11.11-3";
 const CACHE="academia-"+VERSION;
 const FILES=["./","index.html","cloud.js","manifest.webmanifest","icon-192.png","icon-512.png","apple-touch-icon.png",
  "vendor/firebase/firebase-app-compat.js","vendor/firebase/firebase-auth-compat.js","vendor/firebase/firebase-firestore-compat.js"];
