@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Academia de Trading EUR/USD</title>
 <meta name="description" content="Curso completo de trading, economía, bolsa y criptomonedas desde cero, con simulador de backtesting del EUR/USD.">
-<meta name="theme-color" content="#15202B">
+<meta name="theme-color" content="#F3EEE4">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -18,32 +18,19 @@
 <style>
 /* Layout: cuaderno de bitácora de un trader. Barra de pestañas arriba, una vista a la vez, ancho de lectura en el curso y ancho completo en el simulador. */
 :root{
-  --bg:#F2F4F6; --surface:#FFFFFF; --ink:#15202B; --muted:#5A6774; --line:#D8DEE4;
-  --accent:#2A58D6; --accent-soft:#E5ECFC; --accent-ink:#FFFFFF;
-  --up:#12876A; --down:#D0434A; --warn:#A86C12; --note:#FFF8DF; --note-line:#E6D38C; --note-rule:#EFE3B4;
+  /* Paleta hueso: fondo cálido, texto gris oscuro y colores pastel de bajo contraste. Un solo tema, también en modo oscuro del sistema. */
+  --bg:#F3EEE4; --surface:#F9F6EF; --ink:#45423C; --muted:#7A766D; --line:#E2DBCE;
+  --accent:#6A86A3; --accent-soft:#E4EAF0; --accent-ink:#FDFBF7;
+  --up:#7BA58E; --down:#C98B84; --warn:#BE9A62; --note:#F6EEDB; --note-line:#E4D7B6; --note-rule:#EEE4CB;
   --font-d:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
   --font-b:"IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
   --font-m:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
   color-scheme:light;
 }
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --bg:#0E141A; --surface:#151D26; --ink:#E3E9EF; --muted:#95A3B0; --line:#26323E;
-    --accent:#7E9CFF; --accent-soft:#1C2949; --accent-ink:#0E141A;
-    --up:#2CB48E; --down:#F0676C; --warn:#E0A84A; --note:#211E12; --note-line:#5A4C1E; --note-rule:#2F2A17;
-    color-scheme:dark;
-  }
-}
-:root[data-theme="dark"]{
-  --bg:#0E141A; --surface:#151D26; --ink:#E3E9EF; --muted:#95A3B0; --line:#26323E;
-  --accent:#7E9CFF; --accent-soft:#1C2949; --accent-ink:#0E141A;
-  --up:#2CB48E; --down:#F0676C; --warn:#E0A84A; --note:#211E12; --note-line:#5A4C1E; --note-rule:#2F2A17;
-  color-scheme:dark;
-}
 *{box-sizing:border-box}
 html,body{margin:0}
-body{background:var(--bg);color:var(--ink);font-family:var(--font-b);font-size:16px;line-height:1.6}
-h1,h2,h3,h4{font-family:var(--font-d);line-height:1.2;text-wrap:balance;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-b);font-size:16px;line-height:1.7}
+h1,h2,h3,h4{font-family:var(--font-d);line-height:1.2;text-wrap:balance;margin:0;color:#3D3A35;font-weight:600}
 h1{font-size:2rem} h2{font-size:1.5rem} h3{font-size:1.2rem} h4{font-size:1.05rem;margin:1.4em 0 .4em}
 p{margin:.6em 0} ul,ol{margin:.5em 0;padding-left:1.3em} li{margin:.25em 0}
 a{color:var(--accent)}
@@ -77,7 +64,7 @@ main{max-width:1180px;margin:0 auto;padding:24px 16px 64px}
 .grid{display:grid;gap:16px}
 .muted{color:var(--muted)}
 .small{font-size:.875rem}
-.btn{cursor:pointer;border:1px solid var(--line);background:var(--surface);padding:7px 12px;border-radius:8px;font-weight:500;font-size:.9rem}
+.btn{text-decoration:none;display:inline-block;cursor:pointer;border:1px solid var(--line);background:var(--surface);padding:7px 12px;border-radius:8px;font-weight:500;font-size:.9rem}
 .btn:hover{border-color:var(--accent)}
 .btn.pri{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .btn.buy{background:var(--up);border-color:var(--up);color:#fff}
