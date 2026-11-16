@@ -143,25 +143,44 @@ textarea{min-height:90px;resize:vertical;line-height:1.5}
 .modnav{display:flex;justify-content:space-between;gap:10px;margin-top:26px;flex-wrap:wrap}
 
 /* SIMULADOR */
+.simtop{display:grid;gap:10px}
 .simbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .simbar .sep{width:1px;height:26px;background:var(--line)}
-.siminfo{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.88rem;margin:10px 0}
+.simbar .btn{min-height:38px}
+.inl{display:inline;font-size:.85rem}
+select.sm,input.sm{width:auto;padding:6px 8px;min-height:38px}
+#inFecha{max-width:200px}
+.siminfo{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.88rem}
 .siminfo b{font-family:var(--font-m);font-weight:500}
-.sim{display:grid;grid-template-columns:1fr 330px;gap:16px;align-items:start}
-.charts{display:grid;gap:10px}
+.simgrid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;align-items:start;margin-top:12px}
+.sidecol{gap:12px}
+.charts{display:grid;gap:10px;min-width:0}
 .chartbox{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 8px 4px}
-.chartbox .lbl{display:flex;flex-wrap:wrap;gap:2px 10px;justify-content:space-between;font-size:.8rem;color:var(--muted);padding:0 4px 4px;font-family:var(--font-m)}
+.chartbox .lbl{display:flex;flex-wrap:wrap;gap:4px 10px;justify-content:space-between;align-items:center;font-size:.8rem;color:var(--muted);padding:0 2px 6px;font-family:var(--font-m)}
+.zoom{display:flex;gap:6px}
+.btn.xs{padding:4px 10px;min-height:32px;font-size:.85rem}
 canvas{display:block;width:100%;touch-action:manipulation}
-#cvH4{height:230px} #cvLo{height:320px}
+#cvP0,#cvP1{touch-action:none;height:330px;cursor:grab}
+#cvP0.draw,#cvP1.draw{cursor:crosshair}
 .panel h3{font-size:1.05rem;margin-bottom:8px}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.kv{display:flex;justify-content:space-between;font-size:.88rem;padding:3px 0;border-bottom:1px dashed var(--line)}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.row3 .btn{font-size:.82rem;padding:7px 6px}
+.chk{display:flex;gap:8px;align-items:center;color:var(--ink);font-size:.9rem}
+.kv{display:flex;justify-content:space-between;font-size:.88rem;padding:4px 0;border-bottom:1px dashed var(--line)}
 .kv b{font-family:var(--font-m);font-weight:500}
 .msg{font-size:.85rem;padding:8px 10px;border-radius:8px;margin-top:8px;background:var(--bg)}
 .msg.bad{color:var(--down)} .msg.good{color:var(--up)} .msg.warn{color:var(--warn)}
 .dropzone{border:1.5px dashed var(--line);border-radius:10px;padding:12px;text-align:center;font-size:.9rem;color:var(--muted)}
 details.ayuda summary{cursor:pointer;color:var(--accent);font-size:.9rem}
 .kbd{font-family:var(--font-m);font-size:.78rem;border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:0 5px}
+.tabsx{display:flex;gap:6px;flex-wrap:wrap}
+#tblPos td,#tblPos th{white-space:nowrap}
+#tblPos .btn{padding:3px 8px;min-height:30px;font-size:.8rem}
+#bBuy,#bSell{min-height:56px;line-height:1.3}
+#bBuy .mono,#bSell .mono{font-size:.85rem;opacity:.9}
+@media (max-width:1000px){ .simgrid{grid-template-columns:1fr} #cvP0,#cvP1{height:300px} }
+@media (max-width:480px){ #cvP0,#cvP1{height:260px} .row3{grid-template-columns:1fr 1fr} }
 
 /* DIARIO */
 .stats{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
@@ -204,7 +223,7 @@ details.ayuda summary{cursor:pointer;color:var(--accent);font-size:.9rem}
 .check li::before{content:"";flex:none;width:16px;height:16px;border:1.5px solid var(--muted);border-radius:4px;margin-top:4px}
 
 @media (max-width:900px){
-  .hero,.curso,.sim,.reglas{grid-template-columns:1fr}
+  .hero,.curso,.sim,.reglas,#diarioTres{grid-template-columns:1fr}
   .indice{position:static;max-height:none}
   .stats{grid-template-columns:repeat(3,1fr)}
 }
@@ -212,7 +231,6 @@ details.ayuda summary{cursor:pointer;color:var(--accent);font-size:.9rem}
   h1{font-size:1.6rem}
   .stats{grid-template-columns:1fr 1fr}
   .fset .r3{grid-template-columns:1fr 1fr}
-  #cvLo{height:280px} #cvH4{height:200px}
   .savepill{margin-left:0}
   header.top{position:static}
   nav.tabs{flex-wrap:nowrap;overflow-x:auto;width:100%}
@@ -295,90 +313,122 @@ details.ayuda summary{cursor:pointer;color:var(--accent);font-size:.9rem}
 
 <!-- ============ SIMULADOR ============ -->
 <section class="view" id="v-simulador">
-  <div class="card">
-    <div class="simbar">
+  <div class="card simtop">
+    <div class="simbar" role="toolbar" aria-label="Reproducción">
       <button class="btn" id="bRand" title="Empieza en un momento al azar sin ver el futuro">Punto aleatorio</button>
       <span class="sep"></span>
-      <button class="btn pri" id="b1" title="Atajo: flecha derecha">Avanzar 1 vela</button>
-      <button class="btn" id="b5">Avanzar 5</button>
-      <button class="btn" id="bH4" title="Avanza hasta que cierre la vela de 4H actual">Hasta el cierre de 4H</button>
+      <button class="btn pri" id="bPlay" aria-pressed="false">▶ Reproducir</button>
+      <label class="inl" for="selSpeed">Velocidad</label>
+      <select id="selSpeed" class="sm"><option value="1">1 vela/s</option><option value="2">2 velas/s</option><option value="4">4 velas/s</option><option value="8">8 velas/s</option><option value="16">16 velas/s</option><option value="40">40 velas/s</option></select>
+      <button class="btn" id="b1" title="Atajo: flecha derecha">+1 vela</button>
+      <button class="btn" id="bClose" title="Avanza hasta que cierre la vela del gráfico de arriba">Hasta el cierre ↑</button>
       <span class="sep"></span>
-      <button class="btn" id="tBox" aria-pressed="false">Caja CRT</button>
-      <button class="btn" id="tEma" aria-pressed="false">Medias (EMA 20 y 50)</button>
-      <button class="btn" id="tLvl" aria-pressed="false" title="Haz clic en un gráfico para dibujar una línea horizontal">Marcar nivel</button>
-      <button class="btn" id="bClr">Borrar niveles</button>
+      <label class="inl" for="inFecha">Ir a</label>
+      <input type="datetime-local" id="inFecha" class="sm">
+      <button class="btn" id="bIr">Ir</button>
+    </div>
+    <div class="simbar tools" role="toolbar" aria-label="Herramientas de dibujo">
+      <button class="btn tool on" data-tool="cursor" title="Mover el gráfico y arrastrar líneas">✋ Mover</button>
+      <button class="btn tool" data-tool="h" title="Línea horizontal">― Horizontal</button>
+      <button class="btn tool" data-tool="trend" title="Arrastra para dibujar">╱ Tendencia</button>
+      <button class="btn tool" data-tool="rect" title="Arrastra para dibujar">▭ Rectángulo</button>
+      <button class="btn tool" data-tool="fib" title="Arrastra del inicio al final del impulso">Fibonacci</button>
+      <button class="btn tool" data-tool="erase" title="Toca un dibujo para borrarlo">Borrador</button>
+      <button class="btn" id="bUndo">Deshacer</button>
+      <button class="btn" id="bClrDraw">Borrar dibujos</button>
+      <span class="sep"></span>
+      <button class="btn tg" id="tBox" aria-pressed="false">Caja CRT</button>
+      <button class="btn tg" id="tEma" aria-pressed="false">EMA 20/50</button>
+      <button class="btn tg" id="tRsi" aria-pressed="false">RSI</button>
     </div>
     <div class="siminfo" id="siminfo"></div>
   </div>
 
-  <div class="sim" style="margin-top:12px">
+  <div class="simgrid">
     <div class="charts">
-      <div class="chartbox"><div class="lbl"><span>4 HORAS · contexto y caja</span><span id="lblH4"></span></div><canvas id="cvH4" aria-label="Gráfico de 4 horas"></canvas></div>
-      <div class="chartbox"><div class="lbl"><span id="lblLoTf">ENTRADA</span><span id="lblLo"></span></div><canvas id="cvLo" aria-label="Gráfico de entrada"></canvas></div>
-      <p class="small muted" style="margin:0">Atajos: <span class="kbd">→</span> avanzar 1 · <span class="kbd">Shift</span>+<span class="kbd">→</span> avanzar 5 · <span class="kbd">C</span> hasta el cierre de 4H. Si una vela toca el stop y el objetivo a la vez, el simulador cuenta el stop (es lo prudente).</p>
+      <div class="chartbox" id="pane0">
+        <div class="lbl"><span><select class="sm tfsel" data-pane="0" aria-label="Temporalidad del gráfico de arriba"></select> <span class="pinfo" id="pinfo0"></span></span>
+          <span class="zoom"><button class="btn xs" data-z="0" data-d="1" aria-label="Alejar">−</button><button class="btn xs" data-z="0" data-d="-1" aria-label="Acercar">+</button><button class="btn xs" data-live="0" title="Volver a la última vela">→|</button></span></div>
+        <canvas id="cvP0" aria-label="Gráfico superior"></canvas>
+      </div>
+      <div class="chartbox" id="pane1">
+        <div class="lbl"><span><select class="sm tfsel" data-pane="1" aria-label="Temporalidad del gráfico de abajo"></select> <span class="pinfo" id="pinfo1"></span></span>
+          <span class="zoom"><button class="btn xs" data-z="1" data-d="1" aria-label="Alejar">−</button><button class="btn xs" data-z="1" data-d="-1" aria-label="Acercar">+</button><button class="btn xs" data-live="1" title="Volver a la última vela">→|</button></span></div>
+        <canvas id="cvP1" aria-label="Gráfico inferior"></canvas>
+      </div>
+      <p class="small muted" style="margin:0">Arrastra el gráfico para ver el pasado y usa la rueda o − / + para el zoom. Las líneas de stop, objetivo y órdenes pendientes se arrastran con el ratón o el dedo en modo Mover. Atajos: <span class="kbd">→</span> +1 vela · <span class="kbd">Espacio</span> reproducir/pausa · <span class="kbd">Esc</span> volver a Mover.</p>
+
+      <div class="card" id="tablas">
+        <div class="tabsx" role="tablist"><button class="btn xs on" data-tab="pos" role="tab">Abiertas (<span id="nPos">0</span>)</button><button class="btn xs" data-tab="pend" role="tab">Pendientes (<span id="nPend">0</span>)</button><button class="btn xs" data-tab="hist" role="tab">Cerradas en esta sesión</button></div>
+        <div class="tblwrap"><table class="tbl" id="tblPos"></table></div>
+      </div>
     </div>
 
-    <div class="grid">
-      <div class="card panel" id="panelOrden">
-        <h3>Nueva operación</h3>
-        <div class="grid" style="gap:8px">
-          <div><label for="selEst">Estrategia</label>
-            <select id="selEst"><option>CRT</option><option>Retroceso</option><option>Rango asiático</option><option>Otra</option></select></div>
+    <div class="grid sidecol">
+      <div class="card panel" id="ticket">
+        <div class="tabsx"><button class="btn xs on" data-otype="mkt">A mercado</button><button class="btn xs" data-otype="pend">Pendiente</button></div>
+        <div class="grid" style="gap:8px;margin-top:10px">
+          <div id="rowPrecio" hidden><label for="inPrecio">Precio de la orden</label>
+            <div class="row2"><input type="number" step="0.00001" id="inPrecio" inputmode="decimal"><button class="btn" id="pickP">Clic en gráfico</button></div>
+            <div class="small muted" id="pendTipo"></div></div>
           <div class="row2">
             <div><label for="inSL">Stop loss</label><input type="number" step="0.00001" id="inSL" inputmode="decimal"></div>
             <div><label for="inTP">Objetivo</label><input type="number" step="0.00001" id="inTP" inputmode="decimal"></div>
           </div>
+          <div class="row3"><button class="btn" id="pickSL">Clic: stop</button><button class="btn" id="pickTP">Clic: objetivo</button><button class="btn" id="bSug" title="Stop a 1,5 ATR y objetivo a 2R">Sugerir</button></div>
           <div class="row2">
-            <button class="btn" id="pickSL">Clic en gráfico: stop</button>
-            <button class="btn" id="pickTP">Clic en gráfico: objetivo</button>
+            <div><label for="selLote">Tamaño</label><select id="selLote"><option value="riesgo">Por riesgo (%)</option><option value="manual">Lote manual</option></select></div>
+            <div><label for="inLote" id="lblLote">Riesgo (%)</label><input type="number" id="inLote" step="0.01" min="0.01" inputmode="decimal"></div>
           </div>
           <div id="calc" class="small"></div>
-          <label style="display:flex;gap:8px;align-items:center;color:var(--ink);font-size:.9rem"><input type="checkbox" id="chkReglas"> Cumple todas las reglas de mi lista</label>
-          <div><label for="inNota">Nota (por qué entro)</label><input type="text" id="inNota" placeholder="Ej.: trampa sobre el techo de 4H, rompe escalón"></div>
+          <div><label for="selEst">Estrategia</label><select id="selEst"><option>CRT</option><option>Retroceso</option><option>Rango asiático</option><option>Otra</option></select></div>
+          <label class="chk"><input type="checkbox" id="chkReglas"> Cumple todas las reglas de mi lista</label>
+          <div><label for="inNota">Nota</label><input type="text" id="inNota" placeholder="Trampa sobre el techo de 4H, rompe escalón"></div>
           <div class="row2">
-            <button class="btn buy" id="bBuy">Comprar</button>
-            <button class="btn sell" id="bSell">Vender</button>
+            <button class="btn buy" id="bBuy">Comprar<br><span class="mono" id="askP">–</span></button>
+            <button class="btn sell" id="bSell">Vender<br><span class="mono" id="bidP">–</span></button>
           </div>
           <div id="ordMsg"></div>
         </div>
       </div>
 
-      <div class="card panel" id="panelAbierta" hidden>
-        <h3>Operación abierta</h3>
-        <div id="abiertaInfo"></div>
-        <div class="row2" style="margin-top:10px">
-          <button class="btn" id="bBE">Stop a la entrada</button>
-          <button class="btn" id="bCerrar">Cerrar ahora</button>
-        </div>
+      <div class="card panel">
+        <h3>Cuenta</h3>
+        <div class="kv"><span>Saldo</span><b id="kvSaldo">–</b></div>
+        <div class="kv"><span>Equity (con flotante)</span><b id="kvEq">–</b></div>
+        <div class="kv"><span>Margen usado</span><b id="kvMar">–</b></div>
+        <div class="kv"><span>Margen libre</span><b id="kvLib">–</b></div>
+        <div class="kv"><span>Nivel de margen</span><b id="kvNiv">–</b></div>
+        <details class="ayuda" style="margin-top:10px"><summary>Ajustes de la cuenta</summary>
+          <div class="row2" style="margin-top:8px">
+            <div><label for="selCuenta">Tipo de cuenta</label><select id="selCuenta"><option value="micro">Micro (1 lote = 1.000 €)</option><option value="standard">Standard (1 lote = 100.000 €)</option></select></div>
+            <div><label for="selApal">Apalancamiento</label><select id="selApal"><option value="30">1:30</option><option value="100">1:100</option><option value="500">1:500</option><option value="1000">1:1000</option></select></div>
+            <div><label for="inSaldo">Saldo inicial ($)</label><input type="number" id="inSaldo" step="1" min="1"></div>
+            <div><label for="inSpread">Spread (pips)</label><input type="number" id="inSpread" step="0.1" min="0"></div>
+            <div><label for="inOff">Ajuste a hora de Caracas (h)</label><input type="number" id="inOff" step="1" min="-12" max="12"></div>
+          </div>
+          <p class="small muted">Si el nivel de margen baja del 20%, el broker cierra tus operaciones (stop out), como en XM.</p>
+        </details>
       </div>
 
       <div class="card panel">
-        <h3>Cuenta y datos</h3>
-        <div class="row2">
-          <div><label for="inSaldo">Saldo inicial ($)</label><input type="number" id="inSaldo" step="1" min="1"></div>
-          <div><label for="inRiesgo">Riesgo por operación (%)</label><input type="number" id="inRiesgo" step="0.1" min="0.1" max="5"></div>
-          <div><label for="inSpread">Spread (pips)</label><input type="number" id="inSpread" step="0.1" min="0"></div>
-          <div><label for="inOff">Ajuste a hora de Caracas (h)</label><input type="number" id="inOff" step="1" min="-12" max="12"></div>
+        <h3>Datos</h3>
+        <div class="kv"><span>Cargados</span><b id="kvDatos" style="text-align:right">–</b></div>
+        <div class="dropzone" style="margin-top:10px">
+          <label for="fileIn" style="color:var(--ink);cursor:pointer"><strong>Cargar datos de MetaTrader</strong> (CSV de 1m, 5m o 15m)</label>
+          <input type="file" id="fileIn" accept=".csv,.txt,text/csv,text/plain" style="margin-top:8px;width:100%">
         </div>
-        <div class="kv" style="margin-top:10px"><span>Saldo actual</span><b id="kvSaldo">–</b></div>
-        <div class="kv"><span>Datos cargados</span><b id="kvDatos" style="text-align:right">–</b></div>
-        <div style="margin-top:12px">
-          <div class="dropzone" id="drop">
-            <label for="fileIn" style="color:var(--ink);cursor:pointer"><strong>Cargar tus datos de MetaTrader</strong> (CSV de 15m o 5m)</label>
-            <input type="file" id="fileIn" accept=".csv,.txt,text/csv,text/plain" style="margin-top:8px;width:100%">
-          </div>
-          <button class="btn" id="bBuiltin" style="margin-top:8px;width:100%">Volver a los datos incluidos</button>
-          <div id="fileMsg"></div>
-        </div>
+        <button class="btn" id="bBuiltin" style="margin-top:8px;width:100%">Volver a los datos incluidos</button>
+        <div id="fileMsg"></div>
         <details class="ayuda" style="margin-top:10px"><summary>Cómo exportar datos de MetaTrader 5</summary>
           <ol class="small">
             <li>Menú <strong>Ver → Símbolos</strong> (Ctrl+U).</li>
-            <li>Pestaña <strong>Barras</strong>. Elige <strong>EURUSD</strong> y <strong>M15</strong>.</li>
-            <li>Pon un rango de fechas (por ejemplo, los últimos 6 meses) y pulsa <strong>Solicitar</strong>.</li>
-            <li>Pulsa <strong>Exportar barras</strong> y guarda el archivo. Cárgalo aquí.</li>
+            <li>Pestaña <strong>Barras</strong>. Elige <strong>EURUSD</strong> y <strong>M1</strong> (1 minuto): con ellos el simulador construye todas las temporalidades, como Forex Tester.</li>
+            <li>Pon un rango de fechas (3–6 meses es un buen tamaño) y pulsa <strong>Solicitar</strong>.</li>
+            <li>Pulsa <strong>Exportar barras</strong> y carga aquí el archivo.</li>
           </ol>
-          <p class="small">En MetaTrader 4: <strong>Herramientas → Centro de historial</strong> (F2), elige EURUSD M15 y pulsa Exportar. Las horas del archivo son las del servidor de XM: pon en "Ajuste a hora de Caracas" la diferencia (normalmente negativa, por ejemplo −6 o −7).</p>
-          <p class="small">Datos incluidos: velas reales de 1 hora del EUR/USD (abril 2017 – febrero 2018), de la librería de código abierto backtesting.py. Con ellos el gráfico de entrada es de 1 hora en lugar de 15 minutos, y no se conoce su zona horaria exacta.</p>
+          <p class="small">En MetaTrader 4: <strong>Herramientas → Centro de historial</strong> (F2), EURUSD M1, Exportar. Las horas del archivo son las del servidor de XM: pon en "Ajuste a hora de Caracas" la diferencia (normalmente −6 de noviembre a marzo y −7 el resto del año).</p>
+          <p class="small">Datos incluidos: velas reales de 1 hora del EUR/USD (abril 2017 – febrero 2018), de la librería de código abierto backtesting.py. Con ellos, la temporalidad más pequeña es 1 hora.</p>
         </details>
       </div>
     </div>
@@ -395,8 +445,17 @@ details.ayuda summary{cursor:pointer;color:var(--accent);font-size:.9rem}
   <div class="veredicto" id="veredicto" style="margin-top:16px"></div>
   <div class="stats" style="margin-top:12px" id="statsBox"></div>
   <div class="grid" style="grid-template-columns:1.3fr 1fr;margin-top:12px" id="diarioDos">
-    <div class="card"><h3>Curva de la cuenta (en R)</h3><canvas id="cvEq" aria-label="Curva de resultados acumulados"></canvas></div>
+    <div class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><h3>Curva de la cuenta</h3><span class="tabsx"><button class="btn xs on" data-equ="R">En R</button><button class="btn xs" data-equ="$">En $</button></span></div><canvas id="cvEq" aria-label="Curva de resultados acumulados"></canvas></div>
     <div class="card"><h3>Por estrategia</h3><div class="tblwrap"><table class="tbl" id="tblEst"></table></div></div>
+  </div>
+  <div class="card" style="margin-top:12px" id="avanz">
+    <h3>Estadísticas avanzadas</h3>
+    <p class="small muted" style="margin-top:0">En dólares de la cuenta del simulador, con el filtro de estrategia de arriba. El drawdown es la mayor caída desde un máximo de la cuenta.</p>
+    <div class="stats" id="statsAdv"></div>
+    <div class="grid" style="grid-template-columns:1fr 1fr;margin-top:12px" id="diarioTres">
+      <div><h3 style="font-size:1rem">Por día de la semana</h3><div class="tblwrap"><table class="tbl" id="tblDia"></table></div></div>
+      <div><h3 style="font-size:1rem">Por hora de entrada</h3><div class="tblwrap"><table class="tbl" id="tblHora"></table></div></div>
+    </div>
   </div>
   <div class="card" style="margin-top:12px">
     <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center">
@@ -3470,11 +3529,11 @@ const LS = {
 };
 const cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 const fmtP = p => (p==null||isNaN(p)) ? "–" : p.toFixed(5);
-const fmt$ = v => (v<0?"−$":"$") + Math.abs(v).toFixed(2);
-const fmtR = v => (v>0?"+":v<0?"−":"") + Math.abs(v).toFixed(2) + "R";
+const fmt$ = v => (v<=-0.005?"−$":"$") + Math.abs(v).toFixed(2);
+const fmtR = v => (v>=0.005?"+":v<=-0.005?"−":"") + Math.abs(v).toFixed(2) + "R";
 
 /* ---------- estado persistente ---------- */
-const DEF_AJ = {saldo:10, riesgo:1, spread:1.6, off:0, offUser:-6};
+const DEF_AJ = {saldo:10, riesgo:1, spread:1.6, off:0, offUser:-6, cuenta:"micro", apal:500, modoLote:"riesgo", loteManual:0.01};
 const DEF_PLAN = {
   horario:"Lunes a viernes, de 04:00 a 11:00 (hora de Caracas, invierno)",
   riesgo:1, ratio:2, maxOps:2, dia:2, semana:5, fase:"Backtest",
@@ -3748,21 +3807,6 @@ function decodeBuiltin(){
   return {t, o:f(RAW.o), h:f(RAW.h), l:f(RAW.l), c:f(RAW.c), name:"Incluidos: EUR/USD 1H real (2017–2018)", builtin:true};
 }
 function ema(arr, p){ const k=2/(p+1), out=new Array(arr.length); let e=arr[0]; for(let i=0;i<arr.length;i++){ e = i? arr[i]*k + e*(1-k) : arr[0]; out[i]=e; } return out; }
-function prepare(d){
-  const n=d.t.length, diffs=[]; for(let i=1;i<Math.min(n,400);i++) diffs.push(d.t[i]-d.t[i-1]);
-  diffs.sort((a,b)=>a-b); d.tf = Math.round(diffs[Math.floor(diffs.length/2)]/60);
-  d.bucket=new Array(n); d.bk=[];
-  let cur=null;
-  for(let i=0;i<n;i++){
-    const key=Math.floor(d.t[i]/14400);
-    if(!cur || cur.key!==key){ cur={key,s:i,e:i,o:d.o[i],h:d.h[i],l:d.l[i],c:d.c[i],t:key*14400}; d.bk.push(cur); }
-    else { cur.e=i; cur.h=Math.max(cur.h,d.h[i]); cur.l=Math.min(cur.l,d.l[i]); cur.c=d.c[i]; }
-    d.bucket[i]=d.bk.length-1;
-  }
-  d.e20=ema(d.c,20); d.e50=ema(d.c,50);
-  const bc=d.bk.map(b=>b.c); d.h20=ema(bc,20); d.h50=ema(bc,50);
-  return d;
-}
 function parseCSV(text){
   const lines=text.split(/\r?\n/).filter(x=>x.trim());
   const re=/(\d{4})[.\-\/](\d{1,2})[.\-\/](\d{1,2})[ T,;\t]+(\d{1,2}):(\d{2})(?::(\d{2}))?/;
@@ -3780,25 +3824,18 @@ function parseCSV(text){
   return u;
 }
 
-/* ---------- SIMULADOR: estado ---------- */
-let cur=0, levels=[], showBox=LS.get("box",true), showEma=LS.get("ema",false), mode=null, hover={H4:null,Lo:null};
-let draft={sl:null,tp:null}, OPEN=null;
-const scales={};
+/* ---------- SIMULADOR (estilo Forex Tester) ---------- */
+const hover={}, scales={};            /* usados también por los gráficos de los casos prácticos */
+const TFS=[[1,"1m"],[5,"5m"],[15,"15m"],[30,"30m"],[60,"1H"],[240,"4H"],[1440,"1D"]];
+const SP=()=>AJ.spread*0.0001;        /* spread en precio */
+const UNITS=()=>AJ.cuenta==="standard"?100000:1000;
+const PIPV=()=>UNITS()*0.0001;        /* $ por pip y por lote */
+let cur=0, showBox=LS.get("box",true), showEma=LS.get("ema",false), showRsi=LS.get("rsi",false);
+let TOOL="cursor", PICK=null, PLAYING=false, playTimer=null, OTYPE="mkt", TAB="pos";
+let POS=[], PEND=[], HIST=[], DRAW=[], DRAFT={sl:null,tp:null,p:null}, SEQ=1;
+const PANES=[{tf:240,zoom:70,shift:0},{tf:60,zoom:110,shift:0}];
+let DRAG=null, needDraw=false;
 
-function setData(d){
-  D=prepare(d); OPEN=null; levels=[]; draft={sl:null,tp:null};
-  $("#inSL").value=""; $("#inTP").value="";
-  $("#kvDatos").textContent = D.name + " · " + D.t.length.toLocaleString("es") + " velas";
-  $("#lblLoTf").textContent = "ENTRADA · " + (D.tf>=60 ? (D.tf/60)+" HORA" : D.tf+" MINUTOS");
-  randomStart();
-}
-function randomStart(){
-  const n=D.t.length, lo=Math.min(300, Math.floor(n*0.2)), hi=Math.max(lo+1, n-150);
-  cur = lo + Math.floor(Math.random()*(hi-lo));
-  if(OPEN){ closeTrade(D.c[cur],"Manual"); }
-  OPEN=null; levels=[]; draft={sl:null,tp:null}; $("#inSL").value=""; $("#inTP").value="";
-  $("#ordMsg").innerHTML=""; updatePanels(); drawAll();
-}
 function tstr(t){
   const d=new Date((t+AJ.off*3600)*1000);
   const dias=["dom","lun","mar","mié","jue","vie","sáb"], mes=["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
@@ -3807,19 +3844,457 @@ function tstr(t){
 function hhmm(t){ const d=new Date((t+AJ.off*3600)*1000); return String(d.getUTCHours()).padStart(2,"0")+":"+String(d.getUTCMinutes()).padStart(2,"0"); }
 function ddmm(t){ const d=new Date((t+AJ.off*3600)*1000); return d.getUTCDate()+"/"+(d.getUTCMonth()+1); }
 
-function h4Bars(){
-  const k=D.bucket[cur], out=[];
-  for(let j=Math.max(0,k-60); j<k; j++){ const b=D.bk[j]; out.push({t:b.t,o:b.o,h:b.h,l:b.l,c:b.c,e20:D.h20[j],e50:D.h50[j]}); }
-  const b=D.bk[k]; let h=-Infinity,l=Infinity; for(let i=b.s;i<=cur;i++){h=Math.max(h,D.h[i]); l=Math.min(l,D.l[i]);}
-  const kk=2/21, k5=2/51, p20=k>0?D.h20[k-1]:D.c[cur], p50=k>0?D.h50[k-1]:D.c[cur];
-  out.push({t:b.t,o:b.o,h,l,c:D.c[cur],partial:cur<b.e, e20:D.c[cur]*kk+p20*(1-kk), e50:D.c[cur]*k5+p50*(1-k5)});
+/* ===== datos y temporalidades ===== */
+function prepare(d){
+  const n=d.t.length, diffs=[]; for(let i=1;i<Math.min(n,600);i++) diffs.push(d.t[i]-d.t[i-1]);
+  diffs.sort((a,b)=>a-b); d.tf=Math.max(1,Math.round(diffs[Math.floor(diffs.length/2)]/60)); d.series={}; return d;
+}
+function series(tf){
+  const key=tf+"|"+(tf>=1440?AJ.off:0); if(D.series[key]) return D.series[key];
+  const n=D.t.length, map=new Int32Array(n), s=[], e=[], o=[], h=[], l=[], c=[], t=[];
+  let last=null;
+  for(let i=0;i<n;i++){
+    const k = tf>=1440 ? Math.floor((D.t[i]+AJ.off*3600)/86400) : Math.floor(D.t[i]/(tf*60));
+    if(k!==last){ s.push(i); e.push(i); o.push(D.o[i]); h.push(D.h[i]); l.push(D.l[i]); c.push(D.c[i]); t.push(D.t[i]); last=k; }
+    else { const j=s.length-1; e[j]=i; if(D.h[i]>h[j]) h[j]=D.h[i]; if(D.l[i]<l[j]) l[j]=D.l[i]; c[j]=D.c[i]; }
+    map[i]=s.length-1;
+  }
+  const N=c.length, e20=new Float64Array(N), e50=new Float64Array(N), ag=new Float64Array(N), al=new Float64Array(N), atr=new Float64Array(N);
+  const k20=2/21,k50=2/51; let a=0,b=0,g=0,ls=0,tr=0;
+  for(let j=0;j<N;j++){
+    a = j? c[j]*k20+a*(1-k20) : c[j]; b = j? c[j]*k50+b*(1-k50) : c[j]; e20[j]=a; e50[j]=b;
+    const ch = j? c[j]-c[j-1] : 0, up=Math.max(ch,0), dn=Math.max(-ch,0);
+    g = j<14 ? (g*j+up)/(j+1) : (g*13+up)/14; ls = j<14 ? (ls*j+dn)/(j+1) : (ls*13+dn)/14; ag[j]=g; al[j]=ls;
+    const trv = j? Math.max(h[j]-l[j], Math.abs(h[j]-c[j-1]), Math.abs(l[j]-c[j-1])) : h[j]-l[j];
+    tr = j<14 ? (tr*j+trv)/(j+1) : (tr*13+trv)/14; atr[j]=tr;
+  }
+  return D.series[key]={tf,map,s,e,o,h,l,c,t,e20,e50,ag,al,atr};
+}
+/* barras visibles de una temporalidad hasta la vela actual (la última se construye con lo que va pasando) */
+function barsOf(tf, from, to){
+  const S=series(tf), k=S.map[cur], out=[];
+  for(let j=Math.max(0,from); j<=Math.min(to,k); j++){
+    if(j<k) out.push({t:S.t[j],o:S.o[j],h:S.h[j],l:S.l[j],c:S.c[j],e20:S.e20[j],e50:S.e50[j],rsi:rsiOf(S.ag[j],S.al[j]),j});
+    else { let h=-Infinity,l=Infinity; for(let i=S.s[k];i<=cur;i++){ if(D.h[i]>h)h=D.h[i]; if(D.l[i]<l)l=D.l[i]; }
+      const c=D.c[cur], pc = k? S.c[k-1] : c, ch=c-pc, a20=k?S.e20[k-1]:c, a50=k?S.e50[k-1]:c, g0=k?S.ag[k-1]:0, l0=k?S.al[k-1]:0;
+      out.push({t:S.t[k],o:S.o[k],h,l,c,e20:c*2/21+a20*19/21,e50:c*2/51+a50*49/51,rsi:rsiOf((g0*13+Math.max(ch,0))/14,(l0*13+Math.max(-ch,0))/14),j:k,partial:cur<S.e[k]}); }
+  }
   return out;
 }
-function loBars(){ const out=[]; for(let i=Math.max(0,cur-160); i<=cur; i++) out.push({t:D.t[i],o:D.o[i],h:D.h[i],l:D.l[i],c:D.c[i],e20:D.e20[i],e50:D.e50[i]}); return out; }
-function h4Closed(){ return cur===D.bk[D.bucket[cur]].e; }
-function crtBox(){ const k=D.bucket[cur], j=h4Closed()?k:k-1; if(j<0) return null; const b=D.bk[j]; return {hi:b.h, lo:b.l}; }
+function rsiOf(g,l){ return l===0 ? (g===0?50:100) : 100-100/(1+g/l); }
+function atrNow(tf){ const S=series(tf), k=S.map[cur]; return S.atr[Math.max(0,k-1)]; }
+function crtBox(){ if(D.tf>240) return null; const S=series(240), k=S.map[cur], j = cur===S.e[k] ? k : k-1; return j<0?null:{hi:S.h[j],lo:S.l[j]}; }
 
-/* ---------- dibujo ---------- */
+function setData(d){
+  stopPlay(); D=prepare(d); POS=[]; PEND=[]; HIST=[]; DRAFT={sl:null,tp:null,p:null};
+  const avail=TFS.filter(([m])=>m>=D.tf && m%D.tf===0 || m===1440 && D.tf<1440).map(x=>x[0]);
+  PANES[0].tf = avail.includes(240)?240:avail[Math.min(1,avail.length-1)];
+  PANES[1].tf = D.tf<=15 ? (avail.includes(15)?15:D.tf) : D.tf;
+  PANES.forEach(p=>{p.shift=0;});
+  document.querySelectorAll(".tfsel").forEach(sel=>{ const pi=+sel.dataset.pane; sel.innerHTML=TFS.filter(([m])=>avail.includes(m)).map(([m,n])=>`<option value="${m}" ${m===PANES[pi].tf?"selected":""}>${n}</option>`).join(""); });
+  $("#kvDatos").textContent = D.name+" · "+D.t.length.toLocaleString("es")+" velas de "+(D.tf>=60?(D.tf/60)+" h":D.tf+" min");
+  const ses=LS.get("sesion",null);
+  if(ses && ses.datos===D.name && ses.n===D.t.length && ses.cur<D.t.length){ cur=ses.cur; POS=ses.pos||[]; PEND=ses.pend||[]; SEQ=ses.seq||1; }
+  else randomStart(true);
+  DRAW = (LS.get("dibujos",{})[D.name])||[];
+  ["inSL","inTP","inPrecio"].forEach(id=>$("#"+id).value="");
+  updatePanels(); drawAll();
+}
+function randomStart(silent){
+  if(POS.length && silent!==true){ $("#ordMsg").innerHTML=`<div class="msg warn">Cierra tus operaciones abiertas antes de saltar a otro momento.</div>`; return; }
+  stopPlay(); const n=D.t.length, lo=Math.min(Math.max(300,Math.floor(n*0.05)), n-200), hi=Math.max(lo+1, n-200);
+  cur = lo + Math.floor(Math.random()*(hi-lo)); PEND=[]; PANES.forEach(p=>p.shift=0);
+  if(silent!==true){ updatePanels(); drawAll(); saveSesion(); }
+}
+let sesTimer=null;
+function saveSesion(){ clearTimeout(sesTimer); sesTimer=setTimeout(()=>{ LS.set("sesion",{datos:D.name,n:D.t.length,cur,pos:POS,pend:PEND,seq:SEQ}); const all=LS.get("dibujos",{}); all[D.name]=DRAW; LS.set("dibujos",all); },400); }
+
+/* ===== precios y cuenta ===== */
+const bid=()=>D.c[cur], ask=()=>D.c[cur]+SP();
+function flot(p, b){ const px = p.dir==="Compra" ? b : b+SP(); return (px-p.entrada)*(p.dir==="Compra"?1:-1)*p.lote*UNITS(); }
+function saldoActual(){ return AJ.saldo + TRADES.reduce((a,t)=>a+(+t.usd||0),0); }
+function cuenta(){ const b=bid(), fl=POS.reduce((a,p)=>a+flot(p,b),0), bal=saldoActual(), eq=bal+fl, mar=POS.reduce((a,p)=>a+p.lote*UNITS()*p.entrada/AJ.apal,0);
+  return {bal,eq,fl,mar,lib:eq-mar,niv: mar? eq/mar*100 : null}; }
+
+/* ===== avance de la reproducción ===== */
+function pathOf(i){ const o=D.o[i],h=D.h[i],l=D.l[i],c=D.c[i]; return c>=o ? [o,l,h,c] : [o,h,l,c]; }
+/* disparadores en precio bid: dir +1 se activa al subir hasta L, -1 al bajar hasta L */
+function triggers(){
+  const s=SP(), T=[];
+  POS.forEach(p=>{
+    if(p.dir==="Compra"){ if(p.sl!=null) T.push({L:p.sl,d:-1,k:"sl",o:p}); if(p.tp!=null) T.push({L:p.tp,d:1,k:"tp",o:p}); }
+    else { if(p.sl!=null) T.push({L:p.sl-s,d:1,k:"sl",o:p}); if(p.tp!=null) T.push({L:p.tp-s,d:-1,k:"tp",o:p}); }
+  });
+  PEND.forEach(q=>{
+    const L = q.dir==="Compra" ? q.precio-s : q.precio, d = (q.tipo==="limit") === (q.dir==="Compra") ? -1 : 1;
+    T.push({L,d,k:"fill",o:q});
+  });
+  return T;
+}
+function processBar(i){
+  const P=pathOf(i); let x=P[0];
+  /* hueco en la apertura */
+  let guard=0;
+  for(;;){ const t=triggers().find(t=> t.d<0 ? x<=t.L : x>=t.L); if(!t||guard++>50) break; fire(t,x,i,true); }
+  for(let seg=1; seg<4; seg++){
+    const y=P[seg]; guard=0;
+    for(;;){
+      const dir=Math.sign(y-x); if(!dir) break;
+      const cand=triggers().filter(t=> t.d===dir && (dir>0 ? t.L>=x-1e-9 && t.L<=y : t.L<=x+1e-9 && t.L>=y)).sort((a,b)=>Math.abs(a.L-x)-Math.abs(b.L-x));
+      if(!cand.length||guard++>50) break;
+      const t=cand[0]; x=t.L; fire(t,x,i,false);
+    }
+    x=y;
+  }
+}
+function fire(t,x,i,gap){
+  const s=SP();
+  if(t.k==="fill"){ const q=t.o; PEND=PEND.filter(z=>z!==q);
+    const entrada = gap ? (q.dir==="Compra"? x+s : x) : q.precio;
+    abrir(Object.assign({},q,{entrada,iEntrada:i,tEntrada:D.t[i],slOrig:q.sl}),true); return; }
+  const p=t.o, exitBid = gap ? x : t.L, salida = p.dir==="Compra" ? exitBid : exitBid+s;
+  cerrar(p, salida, t.k==="sl" ? (p.sl===p.entrada?"Stop en entrada":"Stop") : "Objetivo", i);
+}
+function step(n){
+  for(let k=0;k<n;k++){
+    if(cur>=D.t.length-1){ stopPlay(); break; }
+    cur++; processBar(cur);
+    const a=cuenta(); if(POS.length && a.niv!=null && a.niv<20){ [...POS].forEach(p=>cerrar(p, p.dir==="Compra"?bid():ask(), "Stop out", cur)); $("#ordMsg").innerHTML=`<div class="msg bad">Stop out: tu nivel de margen bajó del 20% y el broker cerró tus operaciones.</div>`; }
+  }
+  updatePanels(); requestDraw(); saveSesion();
+}
+function stepToClose(){ const S=series(PANES[0].tf), k=S.map[cur]; let g=0; if(cur===S.e[k]) step(1); const k2=S.map[cur]; let n=0; while(cur+n<S.e[k2] && g++<20000) n++; if(n) step(n); }
+function togglePlay(){ PLAYING ? stopPlay() : startPlay(); }
+function startPlay(){ if(cur>=D.t.length-1) return; PLAYING=true; const sp=+$("#selSpeed").value||4; $("#bPlay").textContent="❚❚ Pausa"; $("#bPlay").setAttribute("aria-pressed","true");
+  playTimer=setInterval(()=>step(1), Math.max(25,1000/sp)); }
+function stopPlay(){ PLAYING=false; clearInterval(playTimer); playTimer=null; const b=$("#bPlay"); if(b){ b.textContent="▶ Reproducir"; b.setAttribute("aria-pressed","false"); } }
+function irAFecha(){
+  const v=$("#inFecha").value; if(!v){ $("#ordMsg").innerHTML=`<div class="msg warn">Elige una fecha y hora.</div>`; return; }
+  if(POS.length){ $("#ordMsg").innerHTML=`<div class="msg warn">Cierra tus operaciones abiertas antes de saltar a otra fecha.</div>`; return; }
+  const [dd,tt]=v.split("T"), [Y,M,Dd]=dd.split("-").map(Number), [hh,mm]=(tt||"00:00").split(":").map(Number);
+  const target=Date.UTC(Y,M-1,Dd,hh,mm)/1000 - AJ.off*3600;
+  let lo=0, hi=D.t.length-1; while(lo<hi){ const m=(lo+hi)>>1; if(D.t[m]<target) lo=m+1; else hi=m; }
+  if(target<D.t[0]||target>D.t[D.t.length-1]){ $("#ordMsg").innerHTML=`<div class="msg warn">Esa fecha está fuera de los datos cargados (${tstr(D.t[0])} – ${tstr(D.t[D.t.length-1])}).</div>`; return; }
+  stopPlay(); cur=Math.max(50,lo); PEND=[]; PANES.forEach(p=>p.shift=0); updatePanels(); drawAll(); saveSesion();
+}
+
+/* ===== órdenes ===== */
+function leerTicket(){
+  const sl=parseFloat($("#inSL").value), tp=parseFloat($("#inTP").value), pr=parseFloat($("#inPrecio").value);
+  return {sl:isNaN(sl)?null:sl, tp:isNaN(tp)?null:tp, precio:isNaN(pr)?null:pr};
+}
+function tipoPend(dir, precio){ if(precio==null) return null; return dir==="Compra" ? (precio<ask()?"limit":"stop") : (precio>bid()?"limit":"stop"); }
+function nombreTipo(dir,tipo){ return (dir==="Compra"?"Buy ":"Sell ")+tipo; }
+function lotePara(dir, entrada, sl){
+  if($("#selLote").value==="manual"){ const v=parseFloat($("#inLote").value); return isNaN(v)?0:Math.floor(v*100+1e-9)/100; }
+  if(sl==null) return null;
+  const riesgo=saldoActual()*(parseFloat($("#inLote").value)||1)/100, pips=Math.abs(entrada-sl)*1e4;
+  return pips>0 ? Math.floor(riesgo/(pips*PIPV())*100+1e-9)/100 : 0;
+}
+function valida(dir, entrada, sl, tp){
+  if(sl!=null && (dir==="Compra" ? sl>=entrada : sl<=entrada)) return `Para ${dir==="Compra"?"comprar":"vender"}, el stop va ${dir==="Compra"?"por debajo":"por encima"} del precio de entrada.`;
+  if(tp!=null && (dir==="Compra" ? tp<=entrada : tp>=entrada)) return `Para ${dir==="Compra"?"comprar":"vender"}, el objetivo va ${dir==="Compra"?"por encima":"por debajo"} del precio de entrada.`;
+  return null;
+}
+function calcDraft(){
+  const box=$("#calc"); if(!D||!box) return;
+  const T=leerTicket(), pend=OTYPE==="pend";
+  $("#askP").textContent=fmtP(ask()); $("#bidP").textContent=fmtP(bid());
+  if(pend){ const tb=tipoPend("Compra",T.precio), ts=tipoPend("Venta",T.precio);
+    $("#pendTipo").textContent = T.precio==null ? "Escribe el precio o toca el gráfico." : `Comprar aquí = ${nombreTipo("Compra",tb)} · Vender aquí = ${nombreTipo("Venta",ts)}`; }
+  const dir = T.sl!=null ? (T.sl < (pend&&T.precio!=null?T.precio:bid()) ? "Compra":"Venta") : null;
+  const entrada = pend && T.precio!=null ? T.precio : (dir==="Venta"?bid():ask());
+  const manual=$("#selLote").value==="manual";
+  if(!dir && !manual){ box.innerHTML=`<p class="muted" style="margin:0">Pon el stop (escribiéndolo, con clic en el gráfico o con Sugerir) y verás el lote, el ratio y lo que arriesgas.</p>`; return; }
+  const lote = lotePara(dir||"Compra", entrada, T.sl), pv=(lote||0)*PIPV();
+  const slp = T.sl!=null ? Math.abs(entrada-T.sl)*1e4 : null, tpp = T.tp!=null ? Math.abs(T.tp-entrada)*1e4 : null;
+  const err = dir ? valida(dir, entrada, T.sl, T.tp) : null, ratio = slp&&tpp ? tpp/slp : null;
+  const mar=(lote||0)*UNITS()*entrada/AJ.apal;
+  box.innerHTML = `${dir?`<div class="kv"><span>Sería una</span><b class="${dir==="Compra"?"tr-up":"tr-down"}">${dir}</b></div>`:""}
+    <div class="kv"><span>Lote</span><b>${lote==null?"–":lote.toFixed(2)} <span class="muted">(${((lote||0)*UNITS()).toLocaleString("es")} €)</span></b></div>
+    <div class="kv"><span>Valor de 1 pip</span><b>$${pv.toFixed(pv<0.01?4:3)}</b></div>
+    ${slp!=null?`<div class="kv"><span>Stop</span><b>${slp.toFixed(1)} pips · −$${(slp*pv).toFixed(2)}</b></div>`:""}
+    ${tpp!=null?`<div class="kv"><span>Objetivo</span><b>${tpp.toFixed(1)} pips · +$${(tpp*pv).toFixed(2)}</b></div>`:""}
+    ${ratio?`<div class="kv"><span>Ratio</span><b>${ratio.toFixed(2)}R</b></div>`:""}
+    <div class="kv"><span>Margen necesario</span><b>$${mar.toFixed(2)}</b></div>
+    ${err?`<div class="msg bad">${err}</div>`: (ratio && ratio < (+PLAN.ratio||2) ? `<div class="msg warn">Ratio por debajo de tu mínimo de ${PLAN.ratio}R.</div>` : "")}
+    ${lote!==null && lote<0.01 ? `<div class="msg bad">El lote sale por debajo de 0.01: el stop es demasiado grande para tu riesgo.</div>`:""}`;
+}
+function sugerir(){
+  const tf=PANES[1].tf, a=atrNow(tf), T=leerTicket(), dir=DRAFT.lastDir||"Compra", d=1.5*a;
+  const base = OTYPE==="pend"&&T.precio!=null ? T.precio : (dir==="Compra"?ask():bid());
+  const sl = dir==="Compra" ? base-d : base+d, tp = dir==="Compra" ? base+2*d : base-2*d;
+  $("#inSL").value=sl.toFixed(5); $("#inTP").value=tp.toFixed(5); DRAFT.sl=+sl.toFixed(5); DRAFT.tp=+tp.toFixed(5);
+  $("#ordMsg").innerHTML=`<div class="msg">Stop a 1,5 ATR de ${TFS.find(x=>x[0]===tf)[1]} (${(d*1e4).toFixed(1)} pips) y objetivo a 2R, para una <b>${dir.toLowerCase()}</b> (pulsa Sugerir otra vez para ${dir==="Compra"?"una venta":"una compra"}). Luego muévelos a la estructura arrastrando las líneas.</div>`;
+  DRAFT.lastDir = dir==="Compra"?"Venta":"Compra"; calcDraft(); requestDraw();
+}
+function enviar(dir){
+  const msg=$("#ordMsg"); msg.innerHTML=""; const T=leerTicket(), pend=OTYPE==="pend";
+  if(pend && T.precio==null){ msg.innerHTML=`<div class="msg bad">Escribe el precio de la orden pendiente o tócalo en el gráfico.</div>`; return; }
+  const entrada = pend ? T.precio : (dir==="Compra"?ask():bid());
+  const err=valida(dir,entrada,T.sl,T.tp); if(err){ msg.innerHTML=`<div class="msg bad">${err}</div>`; return; }
+  if($("#selLote").value!=="manual" && T.sl==null){ msg.innerHTML=`<div class="msg bad">Para calcular el lote por riesgo necesito el stop. Ponlo, o cambia a lote manual.</div>`; return; }
+  const lote=lotePara(dir,entrada,T.sl);
+  if(!lote||lote<0.01){ msg.innerHTML=`<div class="msg bad">El lote es menor que 0.01. Acerca el stop o sube el riesgo.</div>`; return; }
+  const mar=lote*UNITS()*entrada/AJ.apal, a=cuenta();
+  if(mar>a.lib){ msg.innerHTML=`<div class="msg bad">Margen insuficiente: esta operación necesita $${mar.toFixed(2)} y tienes $${a.lib.toFixed(2)} libres. Baja el lote.</div>`; return; }
+  const o={id:"op"+Date.now()+"-"+(SEQ),n:SEQ++,dir,lote,sl:T.sl,tp:T.tp,slOrig:T.sl,estrategia:$("#selEst").value,reglas:$("#chkReglas").checked?"Sí":"No",nota:$("#inNota").value.trim()};
+  if(pend){ o.precio=T.precio; o.tipo=tipoPend(dir,T.precio); PEND.push(o); msg.innerHTML=`<div class="msg good">${nombreTipo(dir,o.tipo)} colocada en ${fmtP(o.precio)}.</div>`; }
+  else { abrir(Object.assign(o,{entrada,iEntrada:cur,tEntrada:D.t[cur]})); msg.innerHTML=`<div class="msg good">${dir} de ${lote.toFixed(2)} lotes a ${fmtP(entrada)}.</div>`; }
+  if(T.sl==null) msg.insertAdjacentHTML("beforeend",`<div class="msg warn">Sin stop loss. En tu plan, toda operación lleva stop.</div>`);
+  ["inSL","inTP","inPrecio","inNota"].forEach(id=>$("#"+id).value=""); $("#chkReglas").checked=false; DRAFT={sl:null,tp:null,p:null};
+  updatePanels(); requestDraw(); saveSesion();
+}
+function abrir(p, desdePend){
+  p.riesgoUSD = p.slOrig!=null ? Math.abs(p.entrada-p.slOrig)*p.lote*UNITS() : null;
+  POS.push(p);
+  if(desdePend) $("#ordMsg").innerHTML=`<div class="msg good">Se activó tu ${nombreTipo(p.dir,p.tipo)} a ${fmtP(p.entrada)}.</div>`;
+}
+function cerrar(p, salida, motivo, i){
+  POS=POS.filter(z=>z!==p); i = i ?? cur;
+  const sign=p.dir==="Compra"?1:-1, pips=(salida-p.entrada)*1e4*sign, usd=pips*0.0001*p.lote*UNITS();
+  const r = p.riesgoUSD ? usd/p.riesgoUSD : 0;
+  const rec={id:p.id, estrategia:p.estrategia, dir:p.dir, fecha:tstr(p.tEntrada), cierre:tstr(D.t[i]), tEntrada:p.tEntrada, tCierre:D.t[i], duracionMin:Math.round((D.t[i]-p.tEntrada)/60),
+    entrada:+p.entrada.toFixed(5), stop:p.slOrig!=null?+p.slOrig.toFixed(5):null, objetivo:p.tp!=null?+p.tp.toFixed(5):null, salida:+salida.toFixed(5), motivo,
+    pips:+pips.toFixed(1), r:+r.toFixed(2), usd:+usd.toFixed(3), lote:p.lote, cuenta:AJ.cuenta, reglas:p.reglas, nota:(p.nota||"")+(p.slOrig==null?" [sin stop]":""), datos:D.name, creado:Date.now()};
+  TRADES.push(rec); HIST.unshift(rec); saveTrade(rec); renderRuta();
+}
+function updatePanels(){
+  if(!D) return;
+  const a=cuenta();
+  $("#kvSaldo").textContent=fmt$(a.bal); $("#kvEq").textContent=fmt$(a.eq); $("#kvMar").textContent=fmt$(a.mar); $("#kvLib").textContent=fmt$(a.lib);
+  $("#kvNiv").textContent = a.niv==null ? "–" : Math.round(a.niv).toLocaleString("es")+"%";
+  $("#nPos").textContent=POS.length; $("#nPend").textContent=PEND.length;
+  const S=series(PANES[0].tf), k=S.map[cur], done=cur-S.s[k]+1, tot=Math.round(PANES[0].tf/D.tf);
+  const box=showBox?crtBox():null;
+  $("#siminfo").innerHTML=`<span>Vela actual: <b>${tstr(D.t[cur])}</b> ${AJ.off?"(Caracas)":"(hora del archivo)"}</span><span>Bid <b>${fmtP(bid())}</b> · Ask <b>${fmtP(ask())}</b></span><span>ATR ${TFS.find(x=>x[0]===PANES[1].tf)[1]}: <b>${(atrNow(PANES[1].tf)*1e4).toFixed(1)} pips</b></span>${box?`<span>Caja 4H: <b>${(Math.abs(box.hi-box.lo)*1e4).toFixed(1)} pips</b></span>`:""}<span>Vela de arriba: <b>${Math.min(done,tot)}/${tot}</b></span>${cur>=D.t.length-1?`<span class="tr-down"><b>Fin de los datos</b></span>`:""}`;
+  renderTabla(); calcDraft();
+}
+function renderTabla(){
+  const b=bid(), T=$("#tblPos");
+  if(TAB==="pos"){
+    T.innerHTML=`<tr><th>#</th><th>Tipo</th><th>Lote</th><th>Entrada</th><th>Stop</th><th>Objetivo</th><th>Pips</th><th>Resultado</th><th></th></tr>`+(POS.length?POS.map(p=>{ const f=flot(p,b), px=p.dir==="Compra"?b:b+SP(), pips=(px-p.entrada)*1e4*(p.dir==="Compra"?1:-1);
+      return `<tr><td class="num">${p.n}</td><td class="${p.dir==="Compra"?"tr-up":"tr-down"}">${p.dir}</td><td class="num">${p.lote.toFixed(2)}</td><td class="num">${fmtP(p.entrada)}</td><td class="num">${p.sl!=null?fmtP(p.sl):"–"}</td><td class="num">${p.tp!=null?fmtP(p.tp):"–"}</td><td class="num">${pips.toFixed(1)}</td><td class="num ${f>=0?"tr-up":"tr-down"}">${fmt$(f)}</td><td><button class="btn" data-be="${p.id}">Stop a entrada</button> <button class="btn" data-cl="${p.id}">Cerrar</button></td></tr>`; }).join("") : `<tr><td colspan="9" class="muted">No hay operaciones abiertas.</td></tr>`);
+  } else if(TAB==="pend"){
+    T.innerHTML=`<tr><th>#</th><th>Orden</th><th>Lote</th><th>Precio</th><th>Stop</th><th>Objetivo</th><th></th></tr>`+(PEND.length?PEND.map(q=>`<tr><td class="num">${q.n}</td><td>${nombreTipo(q.dir,q.tipo)}</td><td class="num">${q.lote.toFixed(2)}</td><td class="num">${fmtP(q.precio)}</td><td class="num">${q.sl!=null?fmtP(q.sl):"–"}</td><td class="num">${q.tp!=null?fmtP(q.tp):"–"}</td><td><button class="btn" data-cx="${q.id}">Cancelar</button></td></tr>`).join("") : `<tr><td colspan="7" class="muted">No hay órdenes pendientes.</td></tr>`);
+  } else {
+    T.innerHTML=`<tr><th>Tipo</th><th>Lote</th><th>Entrada</th><th>Salida</th><th>Motivo</th><th>Pips</th><th>$</th><th>R</th></tr>`+(HIST.length?HIST.slice(0,15).map(t=>`<tr><td class="${t.dir==="Compra"?"tr-up":"tr-down"}">${t.dir}</td><td class="num">${(+t.lote).toFixed(2)}</td><td class="num">${fmtP(t.entrada)}</td><td class="num">${fmtP(t.salida)}</td><td>${esc(t.motivo)}</td><td class="num">${t.pips}</td><td class="num ${t.usd>=0?"tr-up":"tr-down"}">${fmt$(t.usd)}</td><td class="num">${t.stop!=null?fmtR(t.r):"–"}</td></tr>`).join("")+`<tr><td colspan="8"><a href="#diario">Ver todo en el Diario →</a></td></tr>` : `<tr><td colspan="8" class="muted">Las operaciones que cierres aparecerán aquí y en el Diario.</td></tr>`);
+  }
+}
+
+/* ===== dibujo de los gráficos ===== */
+function requestDraw(){ if(needDraw) return; needDraw=true; requestAnimationFrame(()=>{ needDraw=false; drawAll(); }); }
+function drawAll(){ if(!D || !$("#v-simulador").classList.contains("on")) return; PANES.forEach((p,i)=>drawPane(i)); }
+function drawPane(pi){
+  const P=PANES[pi], cv=$("#cvP"+pi), dpr=window.devicePixelRatio||1, W=cv.clientWidth, H=cv.clientHeight; if(!W) return;
+  if(cv.width!==Math.round(W*dpr)||cv.height!==Math.round(H*dpr)){ cv.width=Math.round(W*dpr); cv.height=Math.round(H*dpr); }
+  const g=cv.getContext("2d"); g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,W,H);
+  const C={ink:cssv("--ink"),muted:cssv("--muted"),line:cssv("--line"),up:cssv("--up"),down:cssv("--down"),acc:cssv("--accent"),warn:cssv("--warn"),bg:cssv("--surface"),soft:cssv("--accent-soft")};
+  const S=series(P.tf), K=S.map[cur], maxShift=Math.max(0,K-10); if(P.shift>maxShift) P.shift=maxShift;
+  const lastJ=K-Math.round(P.shift), firstJ=lastJ-P.zoom+1, bars=barsOf(P.tf, firstJ, lastJ);
+  const axisW=68, rsiH = showRsi ? Math.round(H*0.24) : 0, botH=20, top=10, bot=H-botH-rsiH-(rsiH?6:0), plotW=W-axisW-4;
+  const slot=plotW/P.zoom, x=i=>plotW-(bars.length-1-i)*slot-slot/2 - (P.shift%1)*slot, vis=bars;
+  let lo=Infinity, hi=-Infinity; vis.forEach(b=>{ if(b.l<lo)lo=b.l; if(b.h>hi)hi=b.h; });
+  if(!isFinite(lo)){ lo=bid()-0.001; hi=bid()+0.001; }
+  const extra=[]; POS.forEach(p=>{extra.push(p.entrada); if(p.sl!=null)extra.push(p.sl); if(p.tp!=null)extra.push(p.tp);}); PEND.forEach(q=>{extra.push(q.precio); if(q.sl!=null)extra.push(q.sl); if(q.tp!=null)extra.push(q.tp);});
+  [DRAFT.sl,DRAFT.tp,DRAFT.p].forEach(v=>{ if(v!=null) extra.push(v); });
+  const span0=hi-lo; extra.forEach(v=>{ if(Math.abs(v-(hi+lo)/2)<span0*2){ lo=Math.min(lo,v); hi=Math.max(hi,v);} });
+  if(P.fixed){ lo=P.fixed.lo; hi=P.fixed.hi; }
+  const pad=(hi-lo)*0.07||0.0005; lo-=pad; hi+=pad;
+  const y=p=>top+(hi-p)/(hi-lo)*(bot-top), yInv=py=>hi-(py-top)/(bot-top)*(hi-lo);
+  P.sc={lo,hi,top,bot,plotW,slot,axisW,W,H,x,y,yInv,bars:vis,tf:P.tf};
+  g.font="11px "+cssv("--font-m"); g.lineWidth=1; g.textBaseline="middle";
+  const steps=[0.0005,0.001,0.0025,0.005,0.01,0.025,0.05,0.1]; const st=steps.find(s=>(hi-lo)/s<=7)||0.2;
+  for(let p=Math.ceil(lo/st)*st; p<=hi; p+=st){ const yy=Math.round(y(p))+.5; g.strokeStyle=C.line; g.globalAlpha=.7; g.beginPath(); g.moveTo(0,yy); g.lineTo(plotW,yy); g.stroke(); g.globalAlpha=1; g.fillStyle=C.muted; g.fillText(p.toFixed(st<0.001?4:3), plotW+6, yy); }
+  /* etiquetas de tiempo */
+  g.textBaseline="alphabetic"; let lastX=-1e9;
+  vis.forEach((b,i)=>{ if(!i) return; const d0=new Date((vis[i-1].t+AJ.off*3600)*1000), d1=new Date((b.t+AJ.off*3600)*1000), xx=x(i);
+    const nuevo = P.tf>=1440 ? d1.getUTCMonth()!==d0.getUTCMonth() : d1.getUTCDate()!==d0.getUTCDate();
+    const marca = nuevo || (P.tf<=15 && d1.getUTCHours()!==d0.getUTCHours() && d1.getUTCHours()%(P.tf<=5?1:4)===0);
+    if(marca && xx-lastX>60){ g.fillStyle=C.muted; g.fillText(nuevo?(P.tf>=1440?["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"][d1.getUTCMonth()]:ddmm(b.t)):hhmm(b.t), xx-14, H-5-rsiH-(rsiH?6:0)+ (rsiH?0:0)); lastX=xx;
+      if(nuevo){ g.strokeStyle=C.line; g.setLineDash([2,4]); g.beginPath(); g.moveTo(Math.round(xx-slot/2)+.5,top); g.lineTo(Math.round(xx-slot/2)+.5,bot); g.stroke(); g.setLineDash([]); } } });
+  /* caja CRT */
+  if(showBox){ const bx=crtBox(); if(bx){ [bx.hi,bx.lo].forEach((v,k)=>{ const yy=Math.round(y(v))+.5; g.strokeStyle=C.acc; g.setLineDash([6,4]); g.beginPath(); g.moveTo(0,yy); g.lineTo(plotW,yy); g.stroke(); g.setLineDash([]); g.fillStyle=C.acc; g.font="600 11px "+cssv("--font-b"); g.textAlign="left"; g.fillText(k?"Piso caja 4H":"Techo caja 4H",6,yy-5); g.font="11px "+cssv("--font-m"); }); } }
+  /* EMAs */
+  if(showEma){ [["e20",C.warn],["e50",C.acc]].forEach(([k,col])=>{ g.strokeStyle=col; g.lineWidth=1.5; g.beginPath(); vis.forEach((b,i)=>{ const yy=y(b[k]); i?g.lineTo(x(i),yy):g.moveTo(x(i),yy); }); g.stroke(); }); g.lineWidth=1; }
+  /* velas */
+  const bw=Math.max(1,Math.floor(slot*0.64));
+  g.save(); g.beginPath(); g.rect(0,top-4,plotW,bot-top+8); g.clip();
+  vis.forEach((b,i)=>{ const xx=Math.round(x(i)), col=b.c>=b.o?C.up:C.down; g.globalAlpha=b.partial?.55:1; g.strokeStyle=col; g.beginPath(); g.moveTo(xx+.5,y(b.h)); g.lineTo(xx+.5,y(b.l)); g.stroke();
+    const y1=y(Math.max(b.o,b.c)), y2=y(Math.min(b.o,b.c)); g.fillStyle=col; g.fillRect(xx-Math.floor(bw/2),y1,bw,Math.max(1,y2-y1)); g.globalAlpha=1; });
+  /* dibujos del usuario */
+  const xT=t=>{ /* tiempo -> x */ if(!vis.length) return 0; let lo2=0,hi2=vis.length-1; if(t<=vis[0].t) return x(0)-(vis[0].t-t)/(P.tf*60)*slot; if(t>=vis[hi2].t) return x(hi2)+(t-vis[hi2].t)/(P.tf*60)*slot;
+    while(lo2<hi2){ const m=(lo2+hi2+1)>>1; if(vis[m].t<=t) lo2=m; else hi2=m-1; } return x(lo2)+(t-vis[lo2].t)/(P.tf*60)*slot; };
+  P.sc.xT=xT; P.sc.tX=px=>{ if(!vis.length) return D.t[cur]; const i=Math.round((px-x(0))/slot); const ii=Math.max(0,Math.min(vis.length-1,i)); return vis[ii].t + (i-ii)*P.tf*60; };
+  const drawShape=(d,preview)=>{ g.strokeStyle=d.erasing?C.down:(preview?C.muted:C.ink); g.fillStyle=g.strokeStyle; g.lineWidth=1.3;
+    if(d.type==="h"){ const yy=y(d.p1.p); g.beginPath(); g.moveTo(0,yy); g.lineTo(plotW,yy); g.stroke(); g.font="10px "+cssv("--font-m"); g.textAlign="right"; g.fillText(d.p1.p.toFixed(5),plotW-4,yy-4); g.textAlign="left"; }
+    else if(d.type==="trend"){ g.beginPath(); g.moveTo(xT(d.p1.t),y(d.p1.p)); g.lineTo(xT(d.p2.t),y(d.p2.p)); g.stroke(); }
+    else if(d.type==="rect"){ const x1=xT(d.p1.t),x2=xT(d.p2.t),y1=y(d.p1.p),y2=y(d.p2.p); g.globalAlpha=.1; g.fillStyle=C.acc; g.fillRect(Math.min(x1,x2),Math.min(y1,y2),Math.abs(x2-x1),Math.abs(y2-y1)); g.globalAlpha=1; g.strokeStyle=preview?C.muted:C.acc; g.strokeRect(Math.min(x1,x2),Math.min(y1,y2),Math.abs(x2-x1),Math.abs(y2-y1)); }
+    else if(d.type==="fib"){ const x1=Math.min(xT(d.p1.t),xT(d.p2.t)), x2=Math.max(xT(d.p1.t),xT(d.p2.t),x1+40); g.font="10px "+cssv("--font-m");
+      [0,0.236,0.382,0.5,0.618,0.786,1].forEach(r=>{ const p=d.p2.p+(d.p1.p-d.p2.p)*r, yy=y(p); g.strokeStyle=(r===0.5||r===0.618)?C.warn:C.muted; g.globalAlpha=r===0||r===1?1:.85; g.beginPath(); g.moveTo(x1,yy); g.lineTo(plotW,yy); g.stroke(); g.globalAlpha=1; g.fillStyle=g.strokeStyle; g.fillText((r*100).toFixed(1)+"%  "+p.toFixed(5),x1+2,yy-3); }); }
+    g.lineWidth=1; };
+  DRAW.forEach(d=>drawShape(d,false)); if(DRAG&&DRAG.kind==="draw"&&DRAG.pane===pi&&DRAG.shape.p2) drawShape(DRAG.shape,true);
+  g.restore();
+  /* RSI */
+  if(rsiH){ const r0=bot+botH+16, r1=H-4; g.strokeStyle=C.line; g.beginPath(); g.moveTo(0,bot+botH+3.5); g.lineTo(plotW,bot+botH+3.5); g.stroke(); const ry=v=>r0+(100-v)/100*(r1-r0); g.strokeStyle=C.line; [30,70].forEach(v=>{ g.setLineDash([3,3]); g.beginPath(); g.moveTo(0,ry(v)); g.lineTo(plotW,ry(v)); g.stroke(); g.setLineDash([]); g.fillStyle=C.muted; g.textBaseline="middle"; g.fillText(String(v),plotW+6,ry(v)); });
+    g.strokeStyle=C.acc; g.lineWidth=1.3; g.beginPath(); vis.forEach((b,i)=>{ i?g.lineTo(x(i),ry(b.rsi)):g.moveTo(x(i),ry(b.rsi)); }); g.stroke(); g.lineWidth=1;
+    const lr=vis.length?vis[vis.length-1].rsi:50; g.fillStyle=C.muted; g.textBaseline="middle"; g.fillText("RSI(14) "+lr.toFixed(0),4,r0-6); }
+  /* líneas de órdenes */
+  g.textBaseline="middle";
+  const tag=(p,col,txt,dash,w)=>{ const yy=Math.round(y(p))+.5; if(yy<top-2||yy>bot+2) return; g.strokeStyle=col; g.lineWidth=w||1.2; g.setLineDash(dash||[]); g.beginPath(); g.moveTo(0,yy); g.lineTo(plotW,yy); g.stroke(); g.setLineDash([]); g.lineWidth=1;
+    g.fillStyle=col; g.fillRect(plotW,yy-9,axisW+4,18); g.fillStyle=C.bg; g.fillText(p.toFixed(5),plotW+5,yy);
+    if(txt){ g.font="600 11px "+cssv("--font-b"); const tw=g.measureText(txt).width+10; g.fillStyle=C.bg; g.globalAlpha=.85; g.fillRect(plotW-tw-6,yy-17,tw,15); g.globalAlpha=1; g.fillStyle=col; g.textAlign="right"; g.fillText(txt,plotW-10,yy-9); g.textAlign="left"; g.font="11px "+cssv("--font-m"); } };
+  const b0=bid();
+  POS.forEach(p=>{ const f=flot(p,b0); tag(p.entrada,C.ink,`#${p.n} ${p.dir} ${p.lote.toFixed(2)} · ${fmt$(f)}`,[],1);
+    if(p.sl!=null) tag(p.sl,C.down,`Stop #${p.n} · ${fmt$((p.sl-p.entrada)*(p.dir==="Compra"?1:-1)*p.lote*UNITS())}`,[],1.6);
+    if(p.tp!=null) tag(p.tp,C.up,`Objetivo #${p.n} · ${fmt$((p.tp-p.entrada)*(p.dir==="Compra"?1:-1)*p.lote*UNITS())}`,[],1.6); });
+  PEND.forEach(q=>{ tag(q.precio,C.acc,`#${q.n} ${nombreTipo(q.dir,q.tipo)} ${q.lote.toFixed(2)}`,[6,4]); if(q.sl!=null) tag(q.sl,C.down,`Stop #${q.n}`,[6,4]); if(q.tp!=null) tag(q.tp,C.up,`Objetivo #${q.n}`,[6,4]); });
+  if(DRAFT.p!=null) tag(DRAFT.p,C.acc,"Precio orden (borrador)",[3,3]);
+  if(DRAFT.sl!=null) tag(DRAFT.sl,C.down,"Stop (borrador)",[3,3]);
+  if(DRAFT.tp!=null) tag(DRAFT.tp,C.up,"Objetivo (borrador)",[3,3]);
+  /* bid / ask */
+  const yb=Math.round(y(b0))+.5; g.fillStyle=C.ink; g.fillRect(plotW,yb-9,axisW+4,18); g.fillStyle=C.bg; g.fillText(b0.toFixed(5),plotW+5,yb);
+  /* cruz del cursor */
+  const hv=hover["p"+pi]; if(hv && hv.y>top && hv.y<bot){ g.strokeStyle=C.muted; g.setLineDash([2,3]); g.beginPath(); g.moveTo(0,hv.y+.5); g.lineTo(plotW,hv.y+.5); g.moveTo(hv.x+.5,top); g.lineTo(hv.x+.5,bot); g.stroke(); g.setLineDash([]);
+    const pr=yInv(hv.y); g.fillStyle=C.muted; g.fillRect(plotW,hv.y-9,axisW+4,18); g.fillStyle=C.bg; g.fillText(pr.toFixed(5),plotW+5,hv.y);
+    const tt=P.sc.tX(hv.x); g.font="10px "+cssv("--font-m"); const lab=ddmm(tt)+" "+hhmm(tt), lw=g.measureText(lab).width+8; g.fillStyle=C.muted; g.fillRect(Math.min(plotW-lw,Math.max(0,hv.x-lw/2)),bot+1,lw,15); g.fillStyle=C.bg; g.fillText(lab,Math.min(plotW-lw,Math.max(0,hv.x-lw/2))+4,bot+9); g.font="11px "+cssv("--font-m"); }
+  const tfn=TFS.find(z=>z[0]===P.tf)[1]; $("#pinfo"+pi).textContent = P.shift>=1 ? `viendo ${Math.round(P.shift)} velas atrás` : "";
+}
+
+/* ===== interacción con los gráficos ===== */
+function pt(ev,cv){ const r=cv.getBoundingClientRect(); return {x:ev.clientX-r.left,y:ev.clientY-r.top}; }
+function lineHits(pi,py){
+  const sc=PANES[pi].sc, near=v=>v!=null && Math.abs(sc.y(v)-py)<=9, out=[];
+  POS.forEach(p=>{ if(near(p.sl)) out.push({ref:p,field:"sl",pos:true}); if(near(p.tp)) out.push({ref:p,field:"tp",pos:true}); });
+  PEND.forEach(q=>{ if(near(q.precio)) out.push({ref:q,field:"precio"}); if(near(q.sl)) out.push({ref:q,field:"sl"}); if(near(q.tp)) out.push({ref:q,field:"tp"}); });
+  ["sl","tp","p"].forEach(f=>{ if(near(DRAFT[f])) out.push({ref:DRAFT,field:f,draft:true}); });
+  return out[0]||null;
+}
+function distSeg(px,py,x1,y1,x2,y2){ const dx=x2-x1,dy=y2-y1,l=dx*dx+dy*dy; let t=l?((px-x1)*dx+(py-y1)*dy)/l:0; t=Math.max(0,Math.min(1,t)); return Math.hypot(px-(x1+t*dx),py-(y1+t*dy)); }
+function drawHit(pi,q){
+  const sc=PANES[pi].sc; let best=null,bd=12;
+  DRAW.forEach(d=>{ let dd=Infinity;
+    if(d.type==="h") dd=Math.abs(sc.y(d.p1.p)-q.y);
+    else if(d.type==="trend") dd=distSeg(q.x,q.y,sc.xT(d.p1.t),sc.y(d.p1.p),sc.xT(d.p2.t),sc.y(d.p2.p));
+    else { const x1=Math.min(sc.xT(d.p1.t),sc.xT(d.p2.t)), x2=Math.max(sc.xT(d.p1.t),sc.xT(d.p2.t)), y1=Math.min(sc.y(d.p1.p),sc.y(d.p2.p)), y2=Math.max(sc.y(d.p1.p),sc.y(d.p2.p));
+      dd = (q.x>=x1-6&&q.x<=(d.type==="fib"?sc.plotW:x2)+6&&q.y>=y1-6&&q.y<=y2+6)?0:Infinity; }
+    if(dd<bd){bd=dd;best=d;} });
+  return best;
+}
+function setTool(t){ TOOL=t; PICK=null; document.querySelectorAll(".tool").forEach(b=>b.classList.toggle("on",b.dataset.tool===t)); ["pickSL","pickTP","pickP"].forEach(id=>$("#"+id).classList.remove("on"));
+  ["cvP0","cvP1"].forEach(id=>$("#"+id).classList.toggle("draw",t!=="cursor")); }
+function setPick(k){ PICK = PICK===k?null:k; if(PICK) setTool("cursor"), PICK=k; ["pickSL","pickTP","pickP"].forEach(id=>$("#"+id).classList.toggle("on",(id==="pickSL"&&PICK==="sl")||(id==="pickTP"&&PICK==="tp")||(id==="pickP"&&PICK==="p"))); ["cvP0","cvP1"].forEach(id=>$("#"+id).classList.toggle("draw",!!PICK)); }
+function aplicarLinea(h, v){
+  v=+v.toFixed(5);
+  if(h.draft){ DRAFT[h.field]=v; $("#"+({sl:"inSL",tp:"inTP",p:"inPrecio"})[h.field]).value=v.toFixed(5); calcDraft(); return; }
+  const o=h.ref, ref = h.pos ? o.entrada : (h.field==="precio"? null : o.precio);
+  if(h.field==="precio"){ o.precio=v; o.tipo=tipoPend(o.dir,v); return; }
+  const buy=o.dir==="Compra";
+  if(h.pos){ const now=buy?bid():ask();
+    if(h.field==="sl" && (buy? v>=now : v<=now)){ $("#ordMsg").innerHTML=`<div class="msg warn">El stop no puede quedar al otro lado del precio actual: se cerraría al instante. Ciérrala a mano si quieres salir.</div>`; return; }
+    if(h.field==="tp" && (buy? v<=now : v>=now)){ $("#ordMsg").innerHTML=`<div class="msg warn">El objetivo tiene que quedar más allá del precio actual.</div>`; return; } }
+  else if(ref!=null && (h.field==="sl" ? (buy? v>=ref : v<=ref) : (buy? v<=ref : v>=ref))){ $("#ordMsg").innerHTML=`<div class="msg warn">Ese nivel queda en el lado equivocado de la orden.</div>`; return; }
+  o[h.field]=v;
+}
+["cvP0","cvP1"].forEach((id,pi)=>{
+  const cv=$("#"+id);
+  cv.addEventListener("pointerdown",ev=>{
+    if(!D||!PANES[pi].sc) return; const q=pt(ev,cv), sc=PANES[pi].sc; cv.setPointerCapture(ev.pointerId); stopPlay();
+    const price=sc.yInv(q.y), t=sc.tX(q.x);
+    if(PICK){ const v=+price.toFixed(5); if(PICK==="p"){ DRAFT.p=v; $("#inPrecio").value=v.toFixed(5); } else { DRAFT[PICK]=v; $("#"+(PICK==="sl"?"inSL":"inTP")).value=v.toFixed(5); } setPick(null); calcDraft(); requestDraw(); return; }
+    if(TOOL==="cursor"){ const h=lineHits(pi,q.y); if(h){ DRAG={kind:"line",h,pane:pi}; return; } DRAG={kind:"pan",pane:pi,x0:q.x,s0:PANES[pi].shift}; return; }
+    if(TOOL==="erase"){ const d=drawHit(pi,q); if(d){ DRAW=DRAW.filter(z=>z!==d); saveSesion(); requestDraw(); } return; }
+    if(TOOL==="h"){ DRAW.push({type:"h",p1:{t,p:price}}); saveSesion(); requestDraw(); return; }
+    DRAG={kind:"draw",pane:pi,shape:{type:TOOL,p1:{t,p:price},p2:null}};
+  });
+  cv.addEventListener("pointermove",ev=>{
+    if(!D||!PANES[pi].sc) return; const q=pt(ev,cv), sc=PANES[pi].sc; hover["p"+pi]=q;
+    if(DRAG&&DRAG.pane===pi){
+      if(DRAG.kind==="pan"){ const S=series(PANES[pi].tf), K=S.map[cur]; PANES[pi].shift=Math.max(0,Math.min(K-10, DRAG.s0+(q.x-DRAG.x0)/sc.slot)); }
+      else if(DRAG.kind==="line"){ const v=sc.yInv(q.y); DRAG.live=v; if(DRAG.h.draft){ DRAFT[DRAG.h.field]=+v.toFixed(5); } else DRAG.h.ref[DRAG.h.field]=v; }
+      else if(DRAG.kind==="draw"){ DRAG.shape.p2={t:sc.tX(q.x),p:sc.yInv(q.y)}; }
+    } else cv.style.cursor = (TOOL==="cursor"&&!PICK&&lineHits(pi,q.y)) ? "ns-resize" : "";
+    requestDraw();
+  });
+  const fin=ev=>{
+    if(!DRAG||DRAG.pane!==pi) return;
+    if(DRAG.kind==="line"){ const h=DRAG.h; if(!h.draft){ const prev=h.prev; } if(DRAG.live!=null){ if(!h.draft){ const o=h.ref, keep=o[h.field]; o[h.field]=DRAG.orig??keep; } aplicarLinea(h,DRAG.live); } updatePanels(); saveSesion(); }
+    else if(DRAG.kind==="draw"){ const s=DRAG.shape; if(s.p2 && Math.abs(PANES[pi].sc.y(s.p1.p)-PANES[pi].sc.y(s.p2.p))+Math.abs(PANES[pi].sc.xT(s.p1.t)-PANES[pi].sc.xT(s.p2.t))>8){ DRAW.push(s); saveSesion(); } }
+    DRAG=null; requestDraw();
+  };
+  cv.addEventListener("pointerup",fin); cv.addEventListener("pointercancel",fin);
+  cv.addEventListener("pointerleave",()=>{ hover["p"+pi]=null; requestDraw(); });
+  cv.addEventListener("wheel",ev=>{ ev.preventDefault(); zoom(pi, ev.deltaY>0?1:-1); },{passive:false});
+});
+/* guardar el valor original al empezar a arrastrar una línea de una orden real */
+document.addEventListener("pointerdown",()=>{ if(DRAG&&DRAG.kind==="line"&&!DRAG.h.draft&&DRAG.orig==null) DRAG.orig=DRAG.h.ref[DRAG.h.field]; },true);
+function zoom(pi,d){ const P=PANES[pi]; P.zoom=Math.max(20,Math.min(400,Math.round(P.zoom*(d>0?1.25:0.8)))); requestDraw(); }
+
+/* ===== ajustes ===== */
+function fillAjustes(){ $("#inSaldo").value=AJ.saldo; $("#inSpread").value=AJ.spread; $("#inOff").value=AJ.off; $("#selCuenta").value=AJ.cuenta||"micro"; $("#selApal").value=String(AJ.apal||500);
+  $("#selLote").value=AJ.modoLote||"riesgo"; syncLote(); }
+function syncLote(){ const man=$("#selLote").value==="manual"; $("#lblLote").textContent=man?"Lote":"Riesgo (%)"; $("#inLote").value = man ? (AJ.loteManual||0.01) : AJ.riesgo; $("#inLote").step = man?"0.01":"0.1"; }
+let ajTimer=null;
+function guardarAjustes(){ clearTimeout(ajTimer); ajTimer=setTimeout(()=>saveDoc("fran/ajustes", AJ, "ajustes"), 800); }
+["inSaldo","inSpread","inOff","selCuenta","selApal"].forEach(id=>$("#"+id).addEventListener("input",()=>{
+  const v=k=>parseFloat($("#"+k).value);
+  if(v("inSaldo")>0) AJ.saldo=v("inSaldo"); if(v("inSpread")>=0) AJ.spread=v("inSpread");
+  if(!isNaN(v("inOff"))){ AJ.off=v("inOff"); if(D && !D.builtin) AJ.offUser=AJ.off; }
+  AJ.cuenta=$("#selCuenta").value; AJ.apal=+$("#selApal").value; guardarAjustes(); updatePanels(); requestDraw();
+}));
+$("#selLote").addEventListener("change",()=>{ AJ.modoLote=$("#selLote").value; syncLote(); guardarAjustes(); calcDraft(); });
+$("#inLote").addEventListener("input",()=>{ const v=parseFloat($("#inLote").value); if(v>0){ if($("#selLote").value==="manual") AJ.loteManual=v; else AJ.riesgo=v; guardarAjustes(); } calcDraft(); });
+
+/* ===== eventos ===== */
+$("#bRand").addEventListener("click",()=>randomStart());
+$("#bPlay").addEventListener("click",togglePlay);
+$("#selSpeed").value=String(LS.get("speed",4)); $("#selSpeed").addEventListener("change",()=>{ LS.set("speed",+$("#selSpeed").value); if(PLAYING){ stopPlay(); startPlay(); } });
+$("#b1").addEventListener("click",()=>{ stopPlay(); step(1); });
+$("#bClose").addEventListener("click",()=>{ stopPlay(); stepToClose(); });
+$("#bIr").addEventListener("click",irAFecha);
+document.querySelectorAll(".tool").forEach(b=>b.addEventListener("click",()=>setTool(b.dataset.tool)));
+$("#bUndo").addEventListener("click",()=>{ DRAW.pop(); saveSesion(); requestDraw(); });
+$("#bClrDraw").addEventListener("click",function(){ if(!this.dataset.armed){ this.dataset.armed="1"; this.textContent="¿Seguro?"; setTimeout(()=>{ delete this.dataset.armed; this.textContent="Borrar dibujos"; },3000); return; } DRAW=[]; saveSesion(); requestDraw(); delete this.dataset.armed; this.textContent="Borrar dibujos"; });
+function syncToggles(){ [["tBox",showBox],["tEma",showEma],["tRsi",showRsi]].forEach(([id,v])=>{ $("#"+id).classList.toggle("on",v); $("#"+id).setAttribute("aria-pressed",v); }); }
+$("#tBox").addEventListener("click",()=>{ showBox=!showBox; LS.set("box",showBox); syncToggles(); updatePanels(); requestDraw(); });
+$("#tEma").addEventListener("click",()=>{ showEma=!showEma; LS.set("ema",showEma); syncToggles(); requestDraw(); });
+$("#tRsi").addEventListener("click",()=>{ showRsi=!showRsi; LS.set("rsi",showRsi); syncToggles(); requestDraw(); });
+document.querySelectorAll(".tfsel").forEach(sel=>sel.addEventListener("change",()=>{ const P=PANES[+sel.dataset.pane]; P.tf=+sel.value; P.shift=0; updatePanels(); requestDraw(); }));
+document.querySelectorAll("[data-z]").forEach(b=>b.addEventListener("click",()=>zoom(+b.dataset.z,+b.dataset.d)));
+document.querySelectorAll("[data-live]").forEach(b=>b.addEventListener("click",()=>{ PANES[+b.dataset.live].shift=0; requestDraw(); }));
+document.querySelectorAll("[data-otype]").forEach(b=>b.addEventListener("click",()=>{ OTYPE=b.dataset.otype; document.querySelectorAll("[data-otype]").forEach(x=>x.classList.toggle("on",x===b)); $("#rowPrecio").hidden=OTYPE!=="pend"; if(OTYPE!=="pend"){ DRAFT.p=null; $("#inPrecio").value=""; } calcDraft(); requestDraw(); }));
+document.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>{ TAB=b.dataset.tab; document.querySelectorAll("[data-tab]").forEach(x=>x.classList.toggle("on",x===b)); renderTabla(); }));
+$("#pickSL").addEventListener("click",()=>setPick("sl")); $("#pickTP").addEventListener("click",()=>setPick("tp")); $("#pickP").addEventListener("click",()=>setPick("p"));
+$("#bSug").addEventListener("click",sugerir);
+["inSL","inTP","inPrecio"].forEach(id=>$("#"+id).addEventListener("input",()=>{ const v=parseFloat($("#"+id).value), k={inSL:"sl",inTP:"tp",inPrecio:"p"}[id]; DRAFT[k]=isNaN(v)?null:v; calcDraft(); requestDraw(); }));
+$("#bBuy").addEventListener("click",()=>enviar("Compra")); $("#bSell").addEventListener("click",()=>enviar("Venta"));
+$("#tblPos").addEventListener("click",ev=>{
+  const b=ev.target.closest("button"); if(!b) return;
+  if(b.dataset.cl){ const p=POS.find(z=>z.id===b.dataset.cl); if(p){ cerrar(p, p.dir==="Compra"?bid():ask(), "Cierre manual"); $("#ordMsg").innerHTML=`<div class="msg">Operación #${p.n} cerrada. Está en el Diario.</div>`; } }
+  if(b.dataset.be){ const p=POS.find(z=>z.id===b.dataset.be); if(p){ const fav = p.dir==="Compra" ? bid()>p.entrada : ask()<p.entrada; if(!fav){ $("#ordMsg").innerHTML=`<div class="msg warn">Solo puedes llevar el stop a la entrada cuando la operación va a favor.</div>`; } else p.sl=p.entrada; } }
+  if(b.dataset.cx){ PEND=PEND.filter(q=>q.id!==b.dataset.cx); }
+  updatePanels(); requestDraw(); saveSesion();
+});
+document.addEventListener("keydown",ev=>{
+  if(!$("#v-simulador").classList.contains("on")) return;
+  const tg=ev.target.tagName; if(tg==="INPUT"||tg==="TEXTAREA"||tg==="SELECT") return;
+  if(ev.key==="ArrowRight"){ ev.preventDefault(); stopPlay(); step(ev.shiftKey?5:1); }
+  else if(ev.key===" "){ ev.preventDefault(); togglePlay(); }
+  else if(ev.key==="Escape"){ setTool("cursor"); setPick(null); }
+});
+$("#fileIn").addEventListener("change", async ev=>{
+  const f=ev.target.files[0]; if(!f) return; const m=$("#fileMsg"); m.innerHTML=`<div class="msg">Leyendo el archivo…</div>`;
+  try{
+    const txt=await f.text(); const rows=parseCSV(txt);
+    if(rows.length<400){ m.innerHTML=`<div class="msg bad">Solo encontré ${rows.length} velas válidas. Necesito al menos 400 y el formato de exportación de MetaTrader (fecha, hora, apertura, máximo, mínimo, cierre).</div>`; return; }
+    const d={t:rows.map(r=>r[0]),o:rows.map(r=>r[1]),h:rows.map(r=>r[2]),l:rows.map(r=>r[3]),c:rows.map(r=>r[4]),name:f.name,builtin:false};
+    AJ.off = AJ.offUser ?? -6; fillAjustes(); setData(d);
+    m.innerHTML=`<div class="msg good">Cargadas ${rows.length.toLocaleString("es")} velas de ${D.tf} minutos (${tstr(D.t[0])} – ${tstr(D.t[D.t.length-1])}). Revisa el ajuste horario: con XM suele ser −6 de noviembre a marzo y −7 el resto del año.</div>`;
+  }catch(e){ m.innerHTML=`<div class="msg bad">No pude leer el archivo. Exporta de nuevo desde MetaTrader como CSV.</div>`; }
+});
+$("#bBuiltin").addEventListener("click",()=>{ AJ.off=0; fillAjustes(); setData(decodeBuiltin()); $("#fileMsg").innerHTML=""; });
+
+/* ---------- gráfico simple (casos prácticos) ---------- */
 function drawChart(cv, bars, key, opts){
   const dpr=window.devicePixelRatio||1, W=cv.clientWidth, H=cv.clientHeight;
   if(!W) return;
@@ -3880,125 +4355,6 @@ function drawChart(cv, bars, key, opts){
   const hv=hover[key]; if(hv!=null && hv>top && hv<bot){ g.strokeStyle=C.muted; g.setLineDash([2,3]); g.beginPath(); g.moveTo(0,hv+.5); g.lineTo(W-axisW,hv+.5); g.stroke(); g.setLineDash([]);
     const p=hi-(hv-top)/(bot-top)*(hi-lo); g.fillStyle=C.muted; g.fillRect(W-axisW,hv-9,axisW,18); g.fillStyle=C.bg; g.fillText(p.toFixed(5),W-axisW+4,hv); }
 }
-function levelList(){
-  const C={acc:cssv("--accent"),up:cssv("--up"),down:cssv("--down"),muted:cssv("--muted"),ink:cssv("--ink")};
-  const L=[];
-  if(showBox){ const b=crtBox(); if(b){ L.push({p:b.hi,col:C.acc,dash:[6,4],txt:"Techo caja 4H"}); L.push({p:b.lo,col:C.acc,dash:[6,4],txt:"Piso caja 4H"}); } }
-  levels.forEach(p=>L.push({p,col:C.muted,dash:[1,0]}));
-  if(OPEN){ L.push({p:OPEN.entrada,col:C.ink,txt:"Entrada"}); L.push({p:OPEN.sl,col:C.down,w:1.5,txt:"Stop"}); L.push({p:OPEN.tp,col:C.up,w:1.5,txt:"Objetivo"}); }
-  else { if(draft.sl!=null) L.push({p:draft.sl,col:C.down,dash:[5,3],txt:"Stop (borrador)"}); if(draft.tp!=null) L.push({p:draft.tp,col:C.up,dash:[5,3],txt:"Objetivo (borrador)"}); }
-  return L;
-}
-function drawAll(){
-  if(!D || !$("#v-simulador").classList.contains("on")) return;
-  const L=levelList();
-  drawChart($("#cvH4"), h4Bars(), "H4", {slot:12, levels:L, ema:showEma, boxBack: showBox?(h4Closed()?1:2):0, showHour:false});
-  drawChart($("#cvLo"), loBars(), "Lo", {slot: window.innerWidth<500?7:8, levels:L, ema:showEma, showHour:false});
-  const k=D.bucket[cur], b=D.bk[k], done=cur-b.s+1, tot=Math.round(240/D.tf);
-  $("#lblH4").textContent = "vela en curso: "+done+"/"+tot+(cur===b.e?" · cerrada":"");
-  $("#lblLo").textContent = hhmm(D.t[cur]);
-  $("#siminfo").innerHTML = `<span>Vela actual: <b>${tstr(D.t[cur])}</b>${AJ.off? " (Caracas)":" (hora del archivo)"}</span><span>Precio: <b>${fmtP(D.c[cur])}</b></span>${showBox&&crtBox()?`<span>Caja 4H: <b>${fmtP(crtBox().lo)} – ${fmtP(crtBox().hi)}</b> (${((crtBox().hi-crtBox().lo)*1e4).toFixed(1)} pips)</span>`:""}${cur>=D.t.length-1?`<span class="tr-down"><b>Fin de los datos</b>: pulsa Punto aleatorio.</span>`:""}`;
-  calcDraft();
-}
-
-/* ---------- avance ---------- */
-function step(n){
-  for(let i=0;i<n;i++){
-    if(cur>=D.t.length-1) break;
-    cur++;
-    if(OPEN) checkHit();
-  }
-  updatePanels(); drawAll();
-}
-function stepToH4Close(){
-  const k=D.bucket[cur]; let guard=0;
-  if(cur===D.bk[k].e){ step(1); }
-  while(cur<D.t.length-1 && cur<D.bk[D.bucket[cur]].e && guard++<200){ cur++; if(OPEN) checkHit(); }
-  updatePanels(); drawAll();
-}
-function checkHit(){
-  const t=OPEN, h=D.h[cur], l=D.l[cur];
-  const hitSL = t.dir==="Compra" ? l<=t.sl : h>=t.sl;
-  const hitTP = t.dir==="Compra" ? h>=t.tp : l<=t.tp;
-  if(hitSL) closeTrade(t.sl, t.sl===t.entrada ? "Stop en entrada" : "Stop");
-  else if(hitTP) closeTrade(t.tp, "Objetivo");
-}
-
-/* ---------- operaciones ---------- */
-function saldoActual(){ return AJ.saldo + TRADES.reduce((a,t)=>a+t.usd,0); }
-function sizing(dir, entry, sl, tp){
-  const slP=Math.abs(entry-sl)*1e4, tpP=Math.abs(tp-entry)*1e4, cost=AJ.spread;
-  const saldo=saldoActual(), riesgo=saldo*AJ.riesgo/100;
-  const lotRaw = riesgo/((slP+cost)*0.10);
-  const lot = Math.floor(lotRaw*100+1e-9)/100;
-  const okSide = dir==="Compra" ? (sl<entry && tp>entry) : (sl>entry && tp<entry);
-  return {slP,tpP,ratio: slP? tpP/slP : 0, lot, riesgo, okSide, perdida: lot*(slP+cost)*0.10, ganancia: lot*(tpP-cost)*0.10};
-}
-function calcDraft(){
-  const box=$("#calc"); if(OPEN || !D){ box.innerHTML=""; return; }
-  const sl=parseFloat($("#inSL").value), tp=parseFloat($("#inTP").value), e=D.c[cur];
-  if(isNaN(sl)||isNaN(tp)){ box.innerHTML=`<p class="muted" style="margin:0">Pon stop y objetivo (escribiendo el precio o con clic en el gráfico) para ver el tamaño y el ratio.</p>`; return; }
-  const dir = sl<e ? "Compra" : "Venta", s=sizing(dir,e,sl,tp);
-  let warn="";
-  if(!s.okSide) warn=`<div class="msg bad">El stop y el objetivo no están a lados opuestos del precio.</div>`;
-  else if(s.lot<0.01) warn=`<div class="msg bad">Con este stop el lote sale por debajo de 0.01: el stop es demasiado grande para tu riesgo.</div>`;
-  else if(s.ratio < (+PLAN.ratio||2)) warn=`<div class="msg warn">Ratio ${s.ratio.toFixed(2)}: por debajo de tu mínimo de ${PLAN.ratio}R.</div>`;
-  box.innerHTML=`<div class="kv"><span>Sería una</span><b class="${dir==="Compra"?"tr-up":"tr-down"}">${dir}</b></div>
-   <div class="kv"><span>Entrada (cierre actual)</span><b>${fmtP(e)}</b></div>
-   <div class="kv"><span>Stop / objetivo</span><b>${s.slP.toFixed(1)} / ${s.tpP.toFixed(1)} pips</b></div>
-   <div class="kv"><span>Ratio</span><b>${s.ratio.toFixed(2)}R</b></div>
-   <div class="kv"><span>Lote (cuenta Micro)</span><b>${s.lot.toFixed(2)}</b></div>
-   <div class="kv"><span>Si toca stop / objetivo</span><b>−${s.perdida.toFixed(2)} / +${s.ganancia.toFixed(2)} $</b></div>${warn}`;
-}
-function place(dir){
-  const msg=$("#ordMsg"); msg.innerHTML="";
-  if(OPEN){ return; }
-  const sl=parseFloat($("#inSL").value), tp=parseFloat($("#inTP").value), e=D.c[cur];
-  if(isNaN(sl)||isNaN(tp)){ msg.innerHTML=`<div class="msg bad">Falta el stop o el objetivo. Toda operación lleva los dos.</div>`; return; }
-  const s=sizing(dir,e,sl,tp);
-  if(!s.okSide){ msg.innerHTML=`<div class="msg bad">Para ${dir==="Compra"?"comprar, el stop va por debajo del precio y el objetivo por encima":"vender, el stop va por encima del precio y el objetivo por debajo"}.</div>`; return; }
-  if(s.lot<0.01){ msg.innerHTML=`<div class="msg bad">El lote sale por debajo de 0.01. Acerca el stop o no hay operación.</div>`; return; }
-  OPEN={id:"op"+Date.now(), dir, entrada:e, sl, tp, slOrig:sl, lot:s.lot, slP:s.slP, iEntrada:cur, tEntrada:D.t[cur],
-    estrategia:$("#selEst").value, reglas:$("#chkReglas").checked?"Sí":"No", nota:$("#inNota").value.trim()};
-  draft={sl:null,tp:null}; updatePanels(); drawAll();
-}
-function closeTrade(exit, motivo){
-  const t=OPEN; if(!t) return;
-  const sign = t.dir==="Compra"?1:-1;
-  const pipsBrutos=(exit-t.entrada)*1e4*sign, pips=pipsBrutos-AJ.spread;
-  const riskP=t.slP+AJ.spread, r=pips/riskP, usd=pips*t.lot*0.10;
-  const rec={id:t.id, estrategia:t.estrategia, dir:t.dir, fecha:tstr(t.tEntrada), cierre:tstr(D.t[cur]), duracionVelas:cur-t.iEntrada,
-    entrada:+t.entrada.toFixed(5), stop:+t.slOrig.toFixed(5), objetivo:+t.tp.toFixed(5), salida:+exit.toFixed(5), motivo,
-    pips:+pips.toFixed(1), r:+r.toFixed(2), usd:+usd.toFixed(3), lote:t.lot, reglas:t.reglas, nota:t.nota, datos:D.name, creado:Date.now()};
-  TRADES.push(rec); OPEN=null; saveTrade(rec);
-  $("#ordMsg").innerHTML=`<div class="msg ${r>0?"good":"bad"}">Cerrada por ${motivo.toLowerCase()}: ${rec.pips>0?"+":""}${rec.pips} pips · ${fmtR(rec.r)} · ${fmt$(rec.usd)}. Guardada en el diario.</div>`;
-  $("#inSL").value=""; $("#inTP").value=""; $("#inNota").value=""; $("#chkReglas").checked=false;
-  updatePanels(); renderRuta();
-}
-function updatePanels(){
-  $("#panelAbierta").hidden=!OPEN; $("#panelOrden").hidden=!!OPEN;
-  $("#kvSaldo").textContent = fmt$(saldoActual());
-  if(OPEN){
-    const t=OPEN, sign=t.dir==="Compra"?1:-1, p=(D.c[cur]-t.entrada)*1e4*sign-AJ.spread;
-    $("#abiertaInfo").innerHTML=`<div class="kv"><span>${t.estrategia}</span><b class="${t.dir==="Compra"?"tr-up":"tr-down"}">${t.dir} · ${t.lot.toFixed(2)} lotes</b></div>
-      <div class="kv"><span>Entrada</span><b>${fmtP(t.entrada)}</b></div><div class="kv"><span>Stop</span><b>${fmtP(t.sl)}</b></div><div class="kv"><span>Objetivo</span><b>${fmtP(t.tp)}</b></div>
-      <div class="kv"><span>Resultado flotante</span><b class="${p>=0?"tr-up":"tr-down"}">${p>=0?"+":""}${p.toFixed(1)} pips · ${fmtR(p/(t.slP+AJ.spread))}</b></div>
-      <div class="kv"><span>Velas abierta</span><b>${cur-t.iEntrada}</b></div>`;
-  }
-}
-function setMode(m){ mode = mode===m ? null : m; ["pickSL","pickTP","tLvl"].forEach(id=>$("#"+id).classList.remove("on")); if(mode) $("#"+({sl:"pickSL",tp:"pickTP",lvl:"tLvl"})[mode]).classList.add("on"); }
-function canvasPrice(key, ev){ const s=scales[key], r=ev.target.getBoundingClientRect(), yy=ev.clientY-r.top; return {p: s.hi-(yy-s.top)/(s.bot-s.top)*(s.hi-s.lo), y:yy}; }
-["H4","Lo"].forEach(key=>{
-  const cv=$("#cv"+key);
-  cv.addEventListener("mousemove", ev=>{ if(!scales[key]) return; hover[key]=canvasPrice(key,ev).y; drawAll(); });
-  cv.addEventListener("mouseleave", ()=>{ hover[key]=null; drawAll(); });
-  cv.addEventListener("click", ev=>{
-    if(!mode || !scales[key]) return; const p=+canvasPrice(key,ev).p.toFixed(5);
-    if(mode==="lvl"){ levels.push(p); }
-    else if(!OPEN){ if(mode==="sl"){ $("#inSL").value=p.toFixed(5); draft.sl=p; } else { $("#inTP").value=p.toFixed(5); draft.tp=p; } setMode(null); }
-    drawAll();
-  });
-});
 
 /* ---------- DIARIO ---------- */
 function renderDiario(){
@@ -4025,24 +4381,58 @@ function renderDiario(){
     (list.length? list.slice().reverse().map((t,i)=>`<tr><td class="num">${list.length-i}</td><td>${esc(t.estrategia)}</td><td class="${t.dir==="Compra"?"tr-up":"tr-down"}">${t.dir}</td><td class="small">${esc(t.fecha)}</td><td class="num">${fmtP(t.entrada)}</td><td class="num">${fmtP(t.stop)}</td><td class="num">${fmtP(t.objetivo)}</td><td class="num">${fmtP(t.salida)} <span class="small muted">${esc(t.motivo)}</span></td><td class="num">${t.pips}</td><td class="num ${t.r>0?"tr-up":"tr-down"}">${fmtR(t.r)}</td><td>${t.reglas==="Sí"?'<span class="chip up">Sí</span>':'<span class="chip down">No</span>'}</td><td class="small">${esc(t.nota)}</td><td><button class="btn small" data-del="${esc(t.id)}" aria-label="Borrar operación">Borrar</button></td></tr>`).join("") : `<tr><td colspan="13" class="muted">Aún no hay operaciones. Ve al Simulador, pulsa Punto aleatorio y busca tu primera señal.</td></tr>`);
   $("#tblOps").querySelectorAll("[data-del]").forEach(b=>b.addEventListener("click",()=>{
     if(b.dataset.armed){ deleteTrade(b.dataset.del); } else { b.dataset.armed="1"; b.textContent="¿Seguro?"; setTimeout(()=>{ if(b.isConnected){ delete b.dataset.armed; b.textContent="Borrar"; } },3000); } }));
+  renderAvanz(list);
   drawEquity(list);
 }
+let EQU=LS.get("equ","R");
+function renderAvanz(list){
+  const n=list.length, usd=t=>+t.usd||0, gan=list.filter(t=>usd(t)>0), per=list.filter(t=>usd(t)<0);
+  const gG=gan.reduce((a,t)=>a+usd(t),0), gP=-per.reduce((a,t)=>a+usd(t),0), tot=gG-gP;
+  let bal=AJ.saldo, pico=bal, dd=0, ddp=0; list.forEach(t=>{ bal+=usd(t); if(bal>pico) pico=bal; const d=pico-bal; if(d>dd){ dd=d; ddp=pico? d/pico*100:0; } });
+  const dur=list.filter(t=>t.duracionMin!=null), durM=dur.length? dur.reduce((a,t)=>a+t.duracionMin,0)/dur.length : null;
+  const fdur=m=> m==null?"–": m<60? Math.round(m)+" min" : m<1440? (m/60).toFixed(1)+" h" : (m/1440).toFixed(1)+" días";
+  const pf = gP? gG/gP : (gG? Infinity : null);
+  const tiles=[
+    ["Resultado total", n? fmt$(tot):"–", n?(tot>0?"good":tot<0?"bad":""):""],
+    ["Profit factor", pf==null?"–": pf===Infinity?"∞":pf.toFixed(2), pf==null?"":(pf>1?"good":"bad")],
+    ["Máx. drawdown", n? fmt$(-dd)+" ("+ddp.toFixed(1)+"%)":"–", dd?"bad":""],
+    ["Ganancia media", gan.length? fmt$(gG/gan.length):"–", ""],
+    ["Pérdida media", per.length? fmt$(-gP/per.length):"–", ""],
+    ["Mejor / peor", n? fmt$(Math.max(...list.map(usd)))+" / "+fmt$(Math.min(...list.map(usd))):"–", ""],
+    ["Duración media", fdur(durM), ""],
+    ["Mejor racha ganadora", n? (()=>{let s=0,m=0; list.forEach(t=>{ if(usd(t)>0){s++;m=Math.max(m,s);} else s=0; }); return m;})():"–", ""]
+  ];
+  $("#statsAdv").innerHTML=tiles.map(([a,b,c])=>`<div class="stat ${c}"><b>${b}</b><span>${a}</span></div>`).join("");
+  const conT=list.filter(t=>t.tEntrada!=null);
+  const tabla=(el,keys,labelOf,keyOf,vacio)=>{
+    const g={}; conT.forEach(t=>{ const k=keyOf(t); (g[k]=g[k]||[]).push(t); });
+    const filas=keys.filter(k=>g[k]);
+    el.innerHTML=`<tr><th></th><th>Ops</th><th>Acierto</th><th>$</th><th>R</th></tr>`+(filas.length? filas.map(k=>{ const L=g[k], s=stats(L), u=L.reduce((a,t)=>a+usd(t),0);
+      return `<tr><td>${labelOf(k)}</td><td class="num">${L.length}</td><td class="num">${(s.wr*100).toFixed(0)}%</td><td class="num ${u>0?"tr-up":u<0?"tr-down":""}">${fmt$(u)}</td><td class="num">${fmtR(s.totR)}</td></tr>`; }).join("") : `<tr><td colspan="5" class="muted">${vacio}</td></tr>`);
+  };
+  const off=t=>new Date((t.tEntrada+AJ.off*3600)*1000);
+  const vacio="Aparecerá con las operaciones hechas en el simulador nuevo.";
+  tabla($("#tblDia"),[1,2,3,4,5,0,6],k=>["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"][k],t=>off(t).getUTCDay(),vacio);
+  tabla($("#tblHora"),[...Array(24).keys()],k=>String(k).padStart(2,"0")+":00",t=>off(t).getUTCHours(),vacio);
+}
+document.querySelectorAll("[data-equ]").forEach(b=>{ b.classList.toggle("on",b.dataset.equ===EQU); b.addEventListener("click",()=>{ EQU=b.dataset.equ; LS.set("equ",EQU); document.querySelectorAll("[data-equ]").forEach(x=>x.classList.toggle("on",x===b)); renderDiario(); }); });
 function drawEquity(list){
   const cv=$("#cvEq"); const dpr=window.devicePixelRatio||1, W=cv.clientWidth, H=cv.clientHeight; if(!W) return;
   cv.width=W*dpr; cv.height=H*dpr; const g=cv.getContext("2d"); g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,W,H);
   const C={line:cssv("--line"),muted:cssv("--muted"),acc:cssv("--accent"),soft:cssv("--accent-soft"),ink:cssv("--ink")};
   g.font="11px "+cssv("--font-m");
   if(!list.length){ g.fillStyle=C.muted; g.fillText("La curva aparecerá cuando cierres operaciones.",8,H/2); return; }
-  const pts=[0]; list.forEach(t=>pts.push(pts[pts.length-1]+t.r));
-  let lo=Math.min(0,...pts), hi=Math.max(0,...pts); if(hi-lo<2){ hi+=1; lo-=1; }
-  const L=34,R=8,T=10,B=18, x=i=>L+i/(pts.length-1||1)*(W-L-R), y=v=>T+(hi-v)/(hi-lo)*(H-T-B);
+  const enUSD=EQU==="$", base=enUSD?AJ.saldo:0, pts=[base]; list.forEach(t=>pts.push(pts[pts.length-1]+(enUSD?(+t.usd||0):t.r)));
+  const lab=v=> enUSD ? "$"+(Math.abs(v)>=100?v.toFixed(0):v.toFixed(2)) : (v>0?"+":"")+v+"R";
+  let lo=Math.min(base,...pts), hi=Math.max(base,...pts); const minS=enUSD?Math.max(1,base*0.05):2; if(hi-lo<minS){ hi+=minS/2; lo-=minS/2; }
+  const L=enUSD?50:34,R=8,T=10,B=18, x=i=>L+i/(pts.length-1||1)*(W-L-R), y=v=>T+(hi-v)/(hi-lo)*(H-T-B);
   g.strokeStyle=C.line; g.fillStyle=C.muted; g.textBaseline="middle";
-  const st = (hi-lo)>20?5:(hi-lo)>8?2:1;
-  for(let v=Math.ceil(lo/st)*st; v<=hi; v+=st){ const yy=Math.round(y(v))+.5; g.globalAlpha=v===0?1:.5; g.beginPath(); g.moveTo(L,yy); g.lineTo(W-R,yy); g.stroke(); g.globalAlpha=1; g.fillText((v>0?"+":"")+v+"R",2,yy); }
-  g.fillStyle=C.soft; g.beginPath(); g.moveTo(x(0),y(0)); pts.forEach((v,i)=>g.lineTo(x(i),y(v))); g.lineTo(x(pts.length-1),y(0)); g.closePath(); g.fill();
+  const rng=hi-lo, st=[0.5,1,2,5,10,20,50,100,200,500,1000,5000].find(s=>rng/s<=6)||10000;
+  for(let v=Math.ceil(lo/st)*st; v<=hi; v+=st){ const yy=Math.round(y(v))+.5; g.globalAlpha=v===base?1:.5; g.beginPath(); g.moveTo(L,yy); g.lineTo(W-R,yy); g.stroke(); g.globalAlpha=1; g.fillText(lab(+v.toFixed(2)),2,yy); }
+  g.fillStyle=C.soft; g.beginPath(); g.moveTo(x(0),y(base)); pts.forEach((v,i)=>g.lineTo(x(i),y(v))); g.lineTo(x(pts.length-1),y(base)); g.closePath(); g.fill();
   g.strokeStyle=C.acc; g.lineWidth=2; g.beginPath(); pts.forEach((v,i)=>i?g.lineTo(x(i),y(v)):g.moveTo(x(i),y(v))); g.stroke(); g.lineWidth=1;
   const lx=x(pts.length-1), ly=y(pts[pts.length-1]); g.fillStyle=C.acc; g.beginPath(); g.arc(lx,ly,4,0,7); g.fill();
-  g.fillStyle=C.ink; g.textAlign="right"; g.fillText(fmtR(pts[pts.length-1]), lx-6, ly<T+20? ly+14 : ly-12); g.textAlign="left";
+  g.fillStyle=C.ink; g.textAlign="right"; g.fillText(enUSD?fmt$(pts[pts.length-1]):fmtR(pts[pts.length-1]), lx-6, ly<T+20? ly+14 : ly-12); g.textAlign="left";
   g.fillStyle=C.muted; g.fillText(list.length+" operaciones", L, H-6);
 }
 $("#fEst").addEventListener("change", renderDiario);
@@ -4093,54 +4483,6 @@ $("#formReglas").addEventListener("submit", async ev=>{
   renderChecklist(); calcDraft();
 });
 
-/* ---------- ajustes del simulador ---------- */
-function fillAjustes(){ $("#inSaldo").value=AJ.saldo; $("#inRiesgo").value=AJ.riesgo; $("#inSpread").value=AJ.spread; $("#inOff").value=AJ.off; }
-let ajTimer=null;
-["inSaldo","inRiesgo","inSpread","inOff"].forEach(id=>$("#"+id).addEventListener("input",()=>{
-  const v=k=>parseFloat($("#"+k).value);
-  if(v("inSaldo")>0) AJ.saldo=v("inSaldo"); if(v("inRiesgo")>0) AJ.riesgo=v("inRiesgo"); if(v("inSpread")>=0) AJ.spread=v("inSpread"); if(!isNaN(v("inOff"))) AJ.off=v("inOff");
-  if(D && !D.builtin) AJ.offUser=AJ.off;
-  clearTimeout(ajTimer); ajTimer=setTimeout(()=>saveDoc("fran/ajustes", AJ, "ajustes"), 800);
-  updatePanels(); drawAll();
-}));
-
-/* ---------- eventos simulador ---------- */
-$("#bRand").addEventListener("click", randomStart);
-$("#b1").addEventListener("click", ()=>step(1));
-$("#b5").addEventListener("click", ()=>step(5));
-$("#bH4").addEventListener("click", stepToH4Close);
-function syncToggles(){ $("#tBox").classList.toggle("on",showBox); $("#tBox").setAttribute("aria-pressed",showBox); $("#tEma").classList.toggle("on",showEma); $("#tEma").setAttribute("aria-pressed",showEma); }
-$("#tBox").addEventListener("click", ()=>{ showBox=!showBox; LS.set("box",showBox); syncToggles(); drawAll(); });
-$("#tEma").addEventListener("click", ()=>{ showEma=!showEma; LS.set("ema",showEma); syncToggles(); drawAll(); });
-$("#tLvl").addEventListener("click", ()=>setMode("lvl"));
-$("#bClr").addEventListener("click", ()=>{ levels=[]; drawAll(); });
-$("#pickSL").addEventListener("click", ()=>setMode("sl"));
-$("#pickTP").addEventListener("click", ()=>setMode("tp"));
-["inSL","inTP"].forEach(id=>$("#"+id).addEventListener("input",()=>{ const v=parseFloat($("#"+id).value); draft[id==="inSL"?"sl":"tp"]=isNaN(v)?null:v; drawAll(); }));
-$("#bBuy").addEventListener("click", ()=>place("Compra"));
-$("#bSell").addEventListener("click", ()=>place("Venta"));
-$("#bBE").addEventListener("click", ()=>{ if(!OPEN) return; const ok = OPEN.dir==="Compra" ? D.c[cur]>OPEN.entrada : D.c[cur]<OPEN.entrada;
-  if(!ok){ $("#abiertaInfo").insertAdjacentHTML("beforeend",`<div class="msg warn">Solo puedes pasar el stop a la entrada cuando la operación va a favor.</div>`); return; }
-  OPEN.sl=OPEN.entrada; updatePanels(); drawAll(); });
-$("#bCerrar").addEventListener("click", ()=>{ if(OPEN){ closeTrade(D.c[cur],"Cierre manual"); drawAll(); } });
-document.addEventListener("keydown", ev=>{
-  if(!$("#v-simulador").classList.contains("on")) return;
-  const tg=ev.target.tagName; if(tg==="INPUT"||tg==="TEXTAREA"||tg==="SELECT") return;
-  if(ev.key==="ArrowRight"){ ev.preventDefault(); step(ev.shiftKey?5:1); }
-  else if(ev.key==="c"||ev.key==="C"){ stepToH4Close(); }
-  else if(ev.key==="Escape"){ setMode(null); }
-});
-$("#fileIn").addEventListener("change", async ev=>{
-  const f=ev.target.files[0]; if(!f) return; const m=$("#fileMsg");
-  try{
-    const txt=await f.text(); const rows=parseCSV(txt);
-    if(rows.length<400){ m.innerHTML=`<div class="msg bad">Solo encontré ${rows.length} velas válidas. Necesito al menos 400 y el formato de exportación de MetaTrader (fecha, hora, apertura, máximo, mínimo, cierre).</div>`; return; }
-    const d={t:rows.map(r=>r[0]),o:rows.map(r=>r[1]),h:rows.map(r=>r[2]),l:rows.map(r=>r[3]),c:rows.map(r=>r[4]),name:f.name, builtin:false};
-    AJ.off = AJ.offUser ?? -6; fillAjustes(); setData(d);
-    m.innerHTML=`<div class="msg good">Cargadas ${rows.length.toLocaleString("es")} velas de ${D.tf} minutos. Revisa el ajuste horario: con XM suele ser −6 de noviembre a marzo y −7 el resto del año; compáralo con la hora de tu reloj.</div>`;
-  }catch(e){ m.innerHTML=`<div class="msg bad">No pude leer el archivo. Exporta de nuevo desde MetaTrader como CSV.</div>`; }
-});
-$("#bBuiltin").addEventListener("click", ()=>{ AJ.off=0; fillAjustes(); setData(decodeBuiltin()); $("#fileMsg").innerHTML=""; });
 window.addEventListener("resize", ()=>{ drawAll(); drawBTC(); if($("#v-diario").classList.contains("on")) drawEquity(TRADES.filter(t=>!$("#fEst").value||t.estrategia===$("#fEst").value)); });
 const mq=window.matchMedia("(prefers-color-scheme: dark)"); try{ mq.addEventListener("change", ()=>{ drawAll(); renderDiario(); }); }catch(e){}
 new MutationObserver(()=>{ drawAll(); if($("#v-diario").classList.contains("on")) renderDiario(); }).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
